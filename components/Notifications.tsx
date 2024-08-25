@@ -18,7 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export const Notifications = () => {
+const Notifications = () => {
   const { inboxNotifications } = useInboxNotifications();
   const { count } = useUnreadInboxNotificationsCount();
 
@@ -111,3 +111,5 @@ export const Notifications = () => {
     </Popover>
   );
 };
+
+export default Notifications

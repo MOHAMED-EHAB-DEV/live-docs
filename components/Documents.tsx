@@ -92,7 +92,7 @@ const Documents = ({
         <div className="document-list-container">
           <div className="document-list-title">
             <h3 className="text-28-semibold">All Documents and Folders</h3>
-            <AddDocumentBtn userId={user._id as string} email={user.email} />
+            <AddDocumentBtn isEmpty={false} userId={user._id as string} email={user.email} />
           </div>
           <Toolbar
             isDocuments={true}
@@ -140,6 +140,10 @@ const Documents = ({
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center w-full max-w-[730px]">
+          <div className="document-list-title">
+            <h3 className="text-28-semibold">All Documents and Folders</h3>
+            <AddDocumentBtn isEmpty={true} userId={user._id as string} email={user.email} />
+          </div>
           <Toolbar
             isDocuments={false}
             sortType={sortType}

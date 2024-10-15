@@ -140,7 +140,7 @@ const Documents = ({
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center w-full max-w-[730px]">
-          <div className="document-list-title">
+          <div className="document-list-title mb-2">
             <h3 className="text-28-semibold">All Documents and Folders</h3>
             <AddDocumentBtn isEmpty={true} userId={user._id as string} email={user.email} />
           </div>

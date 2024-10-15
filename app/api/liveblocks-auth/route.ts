@@ -1,23 +1,26 @@
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth/next";
+
 import { liveblocks } from "@/lib/liveblocks";
 import { getUserColor } from "@/lib/utils";
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { getUser } from "@/lib/actions/user.actions";
+import { authOptions } from "@/auth";
 
 export async function POST(request: Request) {
-  const clerkUser = await currentUser();
+  const session = await getServerSession(authOptions);
+  const User = await getUser({ email: session?.user.email! });
+  if (!User) redirect("/sign-in");
 
-  if (!clerkUser) redirect("/sign-in");
-
-  const { id, firstName, lastName, emailAddresses, imageUrl } = clerkUser;
+  const { _id, name, email, image } = User;
   // Get the current user from your database
   const user = {
-    id,
+    id: _id as string,
     info: {
-      id,
-      name: `${firstName} ${lastName}`,
-      email: emailAddresses[0].emailAddress,
-      avatar: imageUrl,
-      color: getUserColor(id),
+      id: _id as string,
+      name,
+      email,
+      avatar: image as string,
+      color: getUserColor(_id as string),
     },
   };
 

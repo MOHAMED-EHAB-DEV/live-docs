@@ -1,20 +1,21 @@
 "use server";
 
-import { clerkClient } from "@clerk/nextjs/server";
+import User from "../models/user";
 import { parseStringify } from "../utils";
 import { liveblocks } from "../liveblocks";
+import { connectToDatabase } from "../database";
+import Documents from "../models/document";
 
-export const getClerkUsers = async ({ userIds }: { userIds: string[] }) => {
+export const getUsers = async ({ userIds }: { userIds: string[] }) => {
   try {
-    const { data } = await clerkClient.users.getUserList({
-      emailAddress: userIds,
-    });
+    await connectToDatabase();
+    const data = await User.find();
 
     const users = data.map((user) => ({
-      id: user.id,
-      name: `${user.firstName} ${user.lastName}`,
-      email: user.emailAddresses[0].emailAddress,
-      avatar: user.imageUrl,
+      id: `${user?._id}`,
+      name: user.name,
+      email: user.email,
+      avatar: user.image,
     }));
 
     const sortedUsers = userIds.map((email) =>
@@ -23,7 +24,19 @@ export const getClerkUsers = async ({ userIds }: { userIds: string[] }) => {
 
     return parseStringify(sortedUsers);
   } catch (error) {
-    console.log(`Error getting clerk users: ${error}`);
+    console.log(`Error getting users: ${error}`);
+  }
+};
+
+export const getUser = async ({ email }: { email: string }) => {
+  try {
+    await connectToDatabase();
+
+    const user = await User.findOne({ email });
+
+    return user;
+  } catch (error) {
+    console.log(`Error getting a user: ${error}`);
   }
 };
 
@@ -56,5 +69,63 @@ export const getDocumentUsers = async ({
     return parseStringify(users);
   } catch (error) {
     console.log(`Error fetching document users: ${error}`);
+  }
+};
+
+export const UpdateUser = async (
+  {
+    name,
+    email,
+    image,
+  }: {
+    name: string;
+    email: string;
+    image: string;
+  },
+  actualEmail: string
+) => {
+  try {
+    await connectToDatabase();
+
+    const userExists = await getUser({ email: actualEmail });
+    if (!userExists) {
+      return {
+        message: "User Doesn't Exists",
+        updated: false,
+      };
+    }
+
+    const user = await User.findOneAndUpdate(
+      { email: actualEmail },
+      { name, email, image }
+    );
+
+    return {
+      message: "User Successfully Updated",
+      updated: true,
+      user,
+    };
+  } catch (error) {
+    console.log(`Error Updating User: ${error}`);
+    return {
+      message: `Error Updating User`,
+      updated: false,
+    };
+  }
+};
+
+export const DeleteUser = async ({ email }: { email: string }) => {
+  try {
+    await connectToDatabase();
+
+    const deletedUser = await User.findOneAndDelete({ email });
+
+    return {
+      message: "Account deleted",
+      deleted: true,
+      user: deletedUser,
+    };
+  } catch (error) {
+    console.log(`Error deleting your user: ${error}`);
   }
 };

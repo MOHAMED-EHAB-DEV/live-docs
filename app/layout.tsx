@@ -1,19 +1,23 @@
 import { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Inter as FontSans } from "next/font/google";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 
 import "./globals.css";
 
 import { cn } from "@/lib/utils";
-import { dark } from "@clerk/themes";
 import Provider from "./Provider";
+import SessionProviderC from "./SessionProvider";
+import { Toaster } from "@/components/ui/toaster";
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-export const metadata: MetaData = {
+export const metadata: Metadata = {
   title: "LiveDocs",
   description: "Your go-to collaborative editor",
 };
@@ -24,12 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: dark,
-        variables: { colorPrimary: "#3371FF", fontSize: "16px" },
-      }}
-    >
+    <SessionProviderC>
       <html lang="en" suppressHydrationWarning>
         <head />
         <body
@@ -38,9 +37,13 @@ export default function RootLayout({
             fontSans.variable
           )}
         >
-          <Provider>{children}</Provider>
+          <Provider>
+            <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
+            {children}
+            <Toaster />
+          </Provider>
         </body>
       </html>
-    </ClerkProvider>
+    </SessionProviderC>
   );
 }

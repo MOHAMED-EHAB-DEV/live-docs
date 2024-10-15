@@ -58,6 +58,10 @@
     @apply focus:ring-0 focus:ring-offset-0 focus-visible:border-none focus-visible:outline-none focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
   }
 
+  .shad-dialog-settings button {
+    @apply focus:ring-0 focus:ring-offset-0 focus-visible:border-none focus-visible:outline-none focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
+  }
+
   .shad-select {
     @apply w-fit border-none bg-transparent text-blue-100 !important;
   }
@@ -103,7 +107,11 @@
   }
 
   .document-list-item {
-    @apply flex items-center justify-between gap-4 rounded-lg bg-doc bg-cover p-5 shadow-xl;
+    @apply flex items-center h-11 justify-between gap-4 rounded-lg bg-doc bg-cover p-5 shadow-xl;
+  }
+  
+  .folder-list-item {
+    @apply flex items-center h-8 justify-between gap-4 rounded-lg p-5 hover:bg-slate-300 hover:bg-opacity-30 bg-opacity-30 transition;
   }
 
   .document-list-empty {
@@ -161,7 +169,15 @@
   }
 
   .document-ul {
-    @apply flex w-full max-w-[730px] flex-col gap-5;
+    @apply flex w-full max-w-[730px] flex-col gap-1;
+  }
+  
+  .folder-ul {
+    @apply flex w-full max-w-[730px] flex-col;
+  }
+
+  .subfolder-document-ul {
+    @apply flex w-full max-w-[730px] flex-col pl-6;
   }
 
   /* ======================== CollaborativeRoom */

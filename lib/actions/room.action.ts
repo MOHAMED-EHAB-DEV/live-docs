@@ -5,10 +5,15 @@ import { liveblocks } from "../liveblocks";
 import { revalidatePath } from "next/cache";
 import { getAccessType, parseStringify } from "../utils";
 import { redirect } from "next/navigation";
+import { UpdateDocuments } from "./documents.action";
+import Documents from "../models/document";
+import Folder, { IFolder } from "../models/folder";
+import SubFolder from "../models/subFolder";
 
 export const createDocument = async ({
   userId,
   email,
+  selectedFolder,
 }: CreateDocumentParams) => {
   const roomId = nanoid();
 
@@ -28,6 +33,9 @@ export const createDocument = async ({
       usersAccesses,
       defaultAccesses: [],
     });
+
+    
+    await UpdateDocuments({ email, id: room.id, selectedFolder });
 
     revalidatePath("/");
 
@@ -77,9 +85,72 @@ export const updateDocument = async (roomId: string, title: string) => {
 
 export const getDocuments = async (email: string) => {
   try {
-    const room = await liveblocks.getRooms({ userId: email });
+    const documents = await Documents.findOne({ authorEmail: email });
+    const folders = await Folder.find({ authorId: email });
 
-    return parseStringify(room);
+    const processedDocuments: Object[] = [];
+
+    if (documents) {
+      for (let i = 0; i < documents?.documents?.length; i++) {
+        const doc = documents?.documents[i];
+
+        const processedDoc = await getDocument({
+          roomId: doc?.id,
+          userId: email,
+        });
+
+        processedDocuments.push(processedDoc);
+      }
+    }
+
+    const processFolder = async (folder: any): Promise<IFolder> => {
+      const processedFolder: IFolder = {
+        id: folder?._id?.toString(),
+        name: folder?.name,
+        updatedAt: folder?.updatedAt,
+        authorId: folder.authorId,
+        documents: [],
+        subFolders: [],
+      };
+
+      if (folder?.documents?.length > 0) {
+        for (let i = 0; i < folder?.documents?.length; i++) {
+          const doc = folder?.documents[i];
+
+          const processedDoc = await getDocument({
+            roomId: doc?.id,
+            userId: email,
+          });
+
+          processedFolder.documents.push(processedDoc);
+        }
+      }
+
+      if (folder?.subFolders?.length > 0) {
+        for (let i = 0; i < folder?.subFolders?.length; i++) {
+          const subFolder = await SubFolder.findOne({ _id: folder.subFolders[i] });
+          if (subFolder) {
+            const processedSubFolder = await processFolder(subFolder);
+            processedFolder.subFolders.push(processedSubFolder);
+          }
+        }
+      }
+
+      return processedFolder;
+    };
+
+    const processedFolders: IFolder[] = [];
+
+    for (let i = 0; i < folders?.length; i++) {
+      const processedFolder: IFolder = await processFolder(folders[i]);
+
+      processedFolders.push(processedFolder);
+    }
+
+    return parseStringify({
+      documents: processedDocuments,
+      folders: processedFolders,
+    });
   } catch (error) {
     console.log(`Error happened while getting rooms: ${error}`);
   }
@@ -97,6 +168,15 @@ export const updateDocumentAccess = async ({
     };
 
     const room = await liveblocks.updateRoom(roomId, { usersAccesses });
+    const documentExists = await Documents.findOne({ authorEmail: email });
+
+    if (documentExists) {
+      const documents = documentExists?.documents;
+      await Documents.findOneAndUpdate(
+        { authorEmail: email },
+        { documents: [...documents, { id: roomId }] }
+      );
+    }
 
     if (room) {
       const notificationId = nanoid();
@@ -143,6 +223,18 @@ export const removeCollaborator = async ({
       },
     });
 
+    const documents = await Documents.findOne({ authorEmail: email });
+
+    if (documents) {
+      const document = documents.documents;
+      const updatedDocuments = document.filter((doc: any) => doc.id !== roomId);
+
+      await Documents.findOneAndUpdate(
+        { authorEmail: email },
+        { documents: updatedDocuments }
+      );
+    }
+
     revalidatePath("/documents/${roomId");
     return parseStringify(updatedRoom);
   } catch (error) {
@@ -150,9 +242,26 @@ export const removeCollaborator = async ({
   }
 };
 
-export const deleteDocument = async (roomId: string) => {
+export const deleteDocument = async (roomId: string, users: User[]) => {
   try {
     await liveblocks.deleteRoom(roomId);
+
+    users?.forEach(async (item) => {
+      const email = item?.email;
+
+      const documents = await Documents.findOne({ authorEmail: email });
+      if (documents) {
+        const document = documents.documents;
+        const updatedDocuments = document.filter(
+          (doc: any) => doc.id !== roomId
+        );
+
+        await Documents.findOneAndUpdate(
+          { authorEmail: email },
+          { documents: updatedDocuments }
+        );
+      }
+    });
 
     revalidatePath("/");
     redirect("/");

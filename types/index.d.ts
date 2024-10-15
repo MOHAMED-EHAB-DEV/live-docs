@@ -19,10 +19,28 @@ declare type RoomMetadata = {
 declare type CreateDocumentParams = {
   userId: string;
   email: string;
+  selectedFolder: {
+    folderId: string;
+    authorId: string;
+    folderName: string;
+    parentId?: string;
+  };
 };
 
+declare type IUser = {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  provider: String;
+  createdAt: Date;
+  folders: Array<Object>;
+  documents: Array<Object>;
+  verified: Boolean;
+}
+
 declare type User = {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   avatar: string;
@@ -68,6 +86,7 @@ declare type CollaborativeRoomProps = {
   roomMetadata: RoomMetadata;
   users: User[];
   currentUserType: UserType;
+  currentUser: IUser;
 };
 
 declare type AddDocumentBtnProps = {

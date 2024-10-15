@@ -45,6 +45,11 @@ export const dateConverter = (timestamp: string): string => {
   }
 };
 
+// by Gpt
+export function capitalizeFirstLetter(word: string) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
 // Function to generate a random color in hex format, excluding specified colors
 export function getRandomColor() {
   const avoidColors = ['#000000', '#FFFFFF', '#8B4513']; // Black, White, Brown in hex format
@@ -87,10 +92,15 @@ export const brightColors = [
 
 export function getUserColor(userId: string) {
   let sum = 0;
-  for (let i = 0; i < userId.length; i++) {
+  for (let i = 0; i < userId?.length; i++) {
     sum += userId.charCodeAt(i);
   }
 
   const colorIndex = sum % brightColors.length;
   return brightColors[colorIndex];
+}
+
+export function isBase64Image(imageData: string) {
+  const base64Regex = /^data:image\/(png|jpe?g|gif|webp);base64,/;
+  return base64Regex.test(imageData);
 }

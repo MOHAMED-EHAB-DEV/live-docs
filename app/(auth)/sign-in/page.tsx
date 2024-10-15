@@ -1,9 +1,9 @@
-import { SignIn } from '@clerk/nextjs'
+import Signin from "@/components/Signin";
 
 const SignInPage = () => {
   return (
     <main className='auth-page'>
-        <SignIn />
+        <Signin />
     </main>
   )
 }

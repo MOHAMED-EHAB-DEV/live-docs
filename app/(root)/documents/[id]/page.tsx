@@ -1,43 +1,50 @@
 import { redirect } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth/next";
 
-import CollaborativeRoom from "@/components/CollaborativeRoom"
+import CollaborativeRoom from "@/components/CollaborativeRoom";
 import { getDocument } from "@/lib/actions/room.action";
-import { getClerkUsers } from "@/lib/actions/user.actions";
+import { getUser, getUsers } from "@/lib/actions/user.actions";
+import { authOptions } from "@/auth";
 
 const page = async ({ params: { id } }: SearchParamProps) => {
-  const clerkUser = await currentUser();
-  if(!clerkUser) redirect('/sign-in');
+  const session = await getServerSession(authOptions);
+  const user = await getUser({ email: session?.user.email! });
+  if (!user) redirect("/sign-in");
 
   const room = await getDocument({
     roomId: id,
-    userId: clerkUser.emailAddresses[0].emailAddress,
+    userId: user?.email as string,
   });
 
-  if(!room) redirect('/')
+  if (!room) redirect("/");
 
   const userIds = Object.keys(room.usersAccesses);
-  const users = await getClerkUsers({ userIds });
+  const users = await getUsers({ userIds });
 
   const usersData = users.map((user: User) => ({
     ...user,
-    userType: room.usersAccesses[user.email]?.includes('room:write')
-      ? 'editor'
-      : 'viewer'
+    userType: room.usersAccesses[user?.email as string]?.includes("room:write")
+      ? "editor"
+      : "viewer",
   }));
 
-  const currentUserType = room.usersAccesses[clerkUser.emailAddresses[0].emailAddress]?.includes('room:write') ? 'editor' : 'viewer';
+  const currentUserType = room.usersAccesses[user?.email as string]?.includes(
+    "room:write"
+  )
+    ? "editor"
+    : "viewer";
 
   return (
     <main className="flex w-full flex-col items-center">
-      <CollaborativeRoom 
+      <CollaborativeRoom
         roomId={id}
         roomMetadata={room.metadata}
         users={usersData}
         currentUserType={currentUserType}
+        currentUser={user as IUser}
       />
     </main>
-  )
-}
+  );
+};
 
-export default page
+export default page;

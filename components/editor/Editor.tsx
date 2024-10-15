@@ -35,9 +35,11 @@ function Placeholder() {
 export function Editor({
   roomId,
   currentUserType,
+  users
 }: {
   roomId: string;
   currentUserType: UserType;
+  users: User[]
 }) {
   const status = useEditorStatus();
   const { threads } = useThreads();
@@ -58,7 +60,7 @@ export function Editor({
       <div className="editor-container size-full">
         <div className="toolbar-wrapper flex min-w-full justify-between">
           <ToolbarPlugin />
-          {currentUserType === 'editor' && <DeleteModel roomId={roomId} />}
+          {currentUserType === 'editor' && <DeleteModel roomId={roomId} users={users} />}
         </div>
 
         <div className="editor-wrapper flex flex-col items-center justify-start">

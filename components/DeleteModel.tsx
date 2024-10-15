@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { deleteDocument } from "@/lib/actions/room.action";
 
-const DeleteModel = ({ roomId }: { roomId: string }) => {
+const DeleteModel = ({ roomId, users }: { roomId: string, users: User[] }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +24,7 @@ const DeleteModel = ({ roomId }: { roomId: string }) => {
     setLoading(true);
 
     try {
-      await deleteDocument(roomId);
+      await deleteDocument(roomId, users);
       setOpen(false);
     } catch (error) {
       console.log("Error notif:", error);

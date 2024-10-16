@@ -14,25 +14,17 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { deleteDocument } from "@/lib/actions/room.action";
+import { deleteFolder } from "@/lib/actions/folders.action";
 
-const DeleteModel = ({
-  roomId,
-  users,
-  folderId,
-}: {
-  roomId: string;
-  users: Array<String>;
-  folderId?: string;
-}) => {
+const DeleteFolderModel = ({ folderId }: { folderId: string }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const deleteDocumentHandler = async () => {
+  const deleteFolderHandler = async () => {
     setLoading(true);
 
     try {
-      await deleteDocument(roomId, users, folderId ? true : false, folderId);
+      await deleteFolder({ folderId });
       setOpen(false);
     } catch (error) {
       console.log("Error notif:", error);
@@ -63,10 +55,10 @@ const DeleteModel = ({
             height={48}
             className="mb-4"
           />
-          <DialogTitle>Delete document</DialogTitle>
+          <DialogTitle>Delete Folder</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this document? This action cannot be
-            undone.
+            Are you sure you want to delete this folder? This action cannot be
+            undone(All Its Documents will be deleted).
           </DialogDescription>
         </DialogHeader>
 
@@ -77,7 +69,7 @@ const DeleteModel = ({
 
           <Button
             variant="destructive"
-            onClick={deleteDocumentHandler}
+            onClick={deleteFolderHandler}
             className="gradient-red w-full"
           >
             {loading ? "Deleting..." : "Delete"}
@@ -88,4 +80,4 @@ const DeleteModel = ({
   );
 };
 
-export default DeleteModel;
+export default DeleteFolderModel;

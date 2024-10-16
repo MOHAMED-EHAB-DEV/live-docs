@@ -34,7 +34,6 @@ export const createDocument = async ({
       defaultAccesses: [],
     });
 
-    
     await UpdateDocuments({ email, id: room.id, selectedFolder });
 
     revalidatePath("/");
@@ -128,7 +127,9 @@ export const getDocuments = async (email: string) => {
 
       if (folder?.subFolders?.length > 0) {
         for (let i = 0; i < folder?.subFolders?.length; i++) {
-          const subFolder = await SubFolder.findOne({ _id: folder.subFolders[i] });
+          const subFolder = await SubFolder.findOne({
+            _id: folder.subFolders[i],
+          });
           if (subFolder) {
             const processedSubFolder = await processFolder(subFolder);
             processedFolder.subFolders.push(processedSubFolder);
@@ -242,24 +243,59 @@ export const removeCollaborator = async ({
   }
 };
 
-export const deleteDocument = async (roomId: string, users: User[]) => {
+export const deleteDocument = async (
+  roomId: string,
+  users: Array<String>,
+  isFolder?: Boolean,
+  folderId?: string
+) => {
   try {
     await liveblocks.deleteRoom(roomId);
 
-    users?.forEach(async (item) => {
-      const email = item?.email;
+    users?.forEach(async (email) => {
+      if (isFolder) {
+        const folder = await Folder.findOne({ authorId: email, _id: folderId });
+        const subFolder = await SubFolder.findOne({
+          authorId: email,
+          _id: folderId,
+        });
 
-      const documents = await Documents.findOne({ authorEmail: email });
-      if (documents) {
-        const document = documents.documents;
-        const updatedDocuments = document.filter(
-          (doc: any) => doc.id !== roomId
-        );
+        if (folder) {
+          const filteredDocuments = folder?.documents?.filter(
+            (doc) => doc?.id !== roomId
+          );
 
-        await Documents.findOneAndUpdate(
-          { authorEmail: email },
-          { documents: updatedDocuments }
-        );
+          await Folder.findOneAndUpdate(
+            { authorId: email, _id: folderId },
+            {
+              documents: filteredDocuments,
+            }
+          );
+        } else if (subFolder) {
+          const filteredDocuments = subFolder?.documents?.filter(
+            (doc) => doc?.id !== roomId
+          );
+
+          await SubFolder.findOneAndUpdate(
+            { authorId: email, _id: folderId },
+            {
+              documents: filteredDocuments,
+            }
+          );
+        }
+      } else {
+        const documents = await Documents.findOne({ authorEmail: email });
+        if (documents) {
+          const document = documents.documents;
+          const updatedDocuments = document.filter(
+            (doc: any) => doc.id !== roomId
+          );
+
+          await Documents.findOneAndUpdate(
+            { authorEmail: email },
+            { documents: updatedDocuments }
+          );
+        }
       }
     });
 

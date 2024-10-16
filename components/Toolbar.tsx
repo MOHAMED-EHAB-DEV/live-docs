@@ -146,7 +146,7 @@ const Toolbar = ({
               id="author"
               className="data-[state=checked]:bg-slate-50 data-[state=checked]:text-slate-900 rounded-xl border-slate-200"
             />
-            <Label htmlFor="author">Filtered by Author</Label>
+            <Label htmlFor="author">Filtered by Author(You)</Label>
           </div>
           <DropdownMenu onOpenChange={(open) => setOpen(open)}>
             <DropdownMenuTrigger className="flex border-0 items-center w-fit justify-between gap-2 px-4 py-2 focus:ring-transparent outline-none">

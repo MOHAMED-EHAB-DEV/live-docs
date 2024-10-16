@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import Folder from "../models/folder";
 import SubFolder from "../models/subFolder";
 import { parseStringify } from "../utils";
+import { liveblocks } from "../liveblocks";
 
 export const createFolder = async ({
   email,
@@ -65,10 +66,7 @@ export const createFolder = async ({
         });
 
         const subFolders = subFolder?.subFolders;
-        const updatedSubFolders = [
-          ...subFolders,
-          newSubFolder._id,
-        ];
+        const updatedSubFolders = [...subFolders, newSubFolder._id];
 
         await SubFolder.findOneAndUpdate(
           { authorId: email, _id: selectedFolder?.folderId },
@@ -95,5 +93,70 @@ export const createFolder = async ({
     return parseStringify(folder);
   } catch (error) {
     console.log(`Error happened while we adding a folder: ${error}`);
+  }
+};
+
+export const deleteFolder = async ({ folderId }: { folderId: string }) => {
+  try {
+    const folder = await Folder.findOne({ _id: folderId });
+    const subFolder = await SubFolder.findOne({ _id: folderId });
+
+    if (folder) {
+      await Folder.findOneAndDelete({ _id: folderId });
+
+      for (let i = 0; i < folder?.documents.length; i++) {
+        const roomId = folder?.documents[i]?.id;
+
+        await liveblocks.deleteRoom(roomId);
+      }
+    } else if (subFolder) {
+      await SubFolder.findOneAndDelete({ _id: folderId });
+      for (let i = 0; i < subFolder?.documents.length; i++) {
+        const roomId = subFolder?.documents[i]?.id;
+
+        await liveblocks.deleteRoom(roomId);
+      }
+    }
+
+    revalidatePath("/");
+  } catch (error) {
+    console.log(`Error while deleting folder: ${error}`);
+  }
+};
+
+export const updateFolder = async ({
+  folderId,
+  folderName,
+}: {
+  folderId: string;
+  folderName: string;
+}) => {
+  try {
+    const folder = await Folder.findOne({ _id: folderId });
+    const subFolder = await SubFolder.findOne({ _id: folderId });
+
+    if (folder) {
+      await Folder.findOneAndUpdate(
+        { _id: folderId },
+        {
+          name: folderName,
+        }
+      );
+    } else if (subFolder) {
+      await SubFolder.findOneAndUpdate(
+        { _id: folderId },
+        {
+          name: folderName,
+        }
+      );
+    };
+
+    revalidatePath("/");
+
+    return true;
+  } catch (error) {
+    console.log(`Error while updating folder: ${error}`);
+
+    return false;
   }
 };

@@ -42,35 +42,41 @@ export const UpdateDocuments = async ({
         const folderDocuments = folderExists?.documents;
         const updatedFolderDocuments = [...folderDocuments, { id }];
 
-        await Folder.findOneAndUpdate({ _id: selectedFolder?.folderId }, {
-          documents: updatedFolderDocuments,
-        });
+        await Folder.findOneAndUpdate(
+          { _id: selectedFolder?.folderId },
+          {
+            documents: updatedFolderDocuments,
+          }
+        );
       } else if (subFolderExists) {
         const subFolderDocuments = subFolderExists?.documents;
         const updatedFolderDocuments = [...subFolderDocuments, { id }];
 
-        await SubFolder.findOneAndUpdate({ _id: selectedFolder?.folderId }, {
-          documents: updatedFolderDocuments,
-        });
+        await SubFolder.findOneAndUpdate(
+          { _id: selectedFolder?.folderId },
+          {
+            documents: updatedFolderDocuments,
+          }
+        );
+      }
+    } else {
+      const DocumentExists = await Documents.findOne({ authorEmail: email });
+
+      if (DocumentExists) {
+        const documents = DocumentExists?.documents;
+        const updatedDocuments = [...documents, { id }];
+
+        await Documents.findOneAndUpdate(
+          { authorEmail: email },
+          { documents: updatedDocuments }
+        );
       } else {
-        const DocumentExists = await Documents.findOne({ authorEmail: email });
+        const Document = new Documents({
+          authorEmail: email,
+          documents: [{ id }],
+        });
 
-        if (DocumentExists) {
-          const documents = DocumentExists?.documents;
-          const updatedDocuments = [...documents, { id }];
-
-          await Documents.findOneAndUpdate(
-            { authorEmail: email },
-            { documents: updatedDocuments }
-          );
-        } else {
-          const Document = new Documents({
-            authorEmail: email,
-            documents: [{ id }],
-          });
-
-          await Document.save();
-        }
+        await Document.save();
       }
     }
 

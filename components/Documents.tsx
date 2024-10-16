@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import AddDocumentBtn from "@/components/AddDocumentBtn";
 import { cn, dateConverter } from "@/lib/utils";
 import DeleteModel from "@/components/DeleteModel";
 import Toolbar from "@/components/Toolbar";
@@ -13,6 +12,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import DeleteFolderModel from "./DeleteFolderModel";
+import { Input } from "./ui/input";
+import { updateFolder } from "@/lib/actions/folders.action";
 
 const Documents = ({
   rDocuments,
@@ -25,6 +27,7 @@ const Documents = ({
     documents: any[];
     folders: any[];
   }>({ documents: rDocuments.documents, folders: rDocuments.folders });
+
   const [sortType, setSortType] = useState("date-newest");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [author, setAuthor] = useState(false);
@@ -45,11 +48,67 @@ const Documents = ({
   });
 
   useEffect(() => {
-    setRoomDocuments({
-      documents: rDocuments.documents || [],
-      folders: rDocuments.folders || [],
-    });
-  }, [rDocuments]);
+    let updatedDocuments = rDocuments.documents || [];
+    let updatedFolders = rDocuments.folders || [];
+
+    if (author) {
+      updatedDocuments = updatedDocuments.filter(
+        (doc) => doc.metadata.email === user.email
+      );
+    }
+
+    if (search) {
+      updatedDocuments = updatedDocuments.filter((doc) =>
+        doc.metadata.title.toLowerCase().includes(search.toLowerCase())
+      );
+      updatedFolders = updatedFolders.filter((folder) =>
+        folder.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    switch (sortType) {
+      case "alphabetical-asc":
+        updatedDocuments = updatedDocuments.sort((a, b) =>
+          a.metadata.title.localeCompare(b.metadata.title)
+        );
+        updatedFolders = updatedFolders.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        break;
+      case "alphabetical-desc":
+        updatedDocuments = updatedDocuments.sort((a, b) =>
+          b.metadata.title.localeCompare(a.metadata.title)
+        );
+        updatedFolders = updatedFolders.sort((a, b) =>
+          b.name.localeCompare(a.name)
+        );
+        break;
+      case "date-newest":
+        updatedDocuments = updatedDocuments.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        updatedFolders = updatedFolders.sort(
+          (a, b) =>
+            new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        );
+        break;
+      case "date-oldest":
+        updatedDocuments = updatedDocuments.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        updatedFolders = updatedFolders.sort(
+          (a, b) =>
+            new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        );
+        break;
+      default:
+        break;
+    }
+
+    setRoomDocuments({ documents: updatedDocuments, folders: updatedFolders });
+  }, [sortType, author, search, user._id]);
 
   const handleFolderClick = (folder: any) => {
     setSelectedFolder((prevSelected) =>
@@ -92,7 +151,6 @@ const Documents = ({
         <div className="document-list-container">
           <div className="document-list-title">
             <h3 className="text-28-semibold">All Documents and Folders</h3>
-            <AddDocumentBtn isEmpty={false} userId={user._id as string} email={user.email} />
           </div>
           <Toolbar
             isDocuments={true}
@@ -142,7 +200,6 @@ const Documents = ({
         <div className="flex flex-col items-center justify-center w-full max-w-[730px]">
           <div className="document-list-title mb-2">
             <h3 className="text-28-semibold">All Documents and Folders</h3>
-            <AddDocumentBtn isEmpty={true} userId={user._id as string} email={user.email} />
           </div>
           <Toolbar
             isDocuments={false}
@@ -194,7 +251,57 @@ const FolderListItem = ({
   isSubFolder: Boolean;
   parentFolder?: any;
 }) => {
-  console.log(folder, "folder");
+  const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [folderName, setFolderName] = useState(folder?.name);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLDivElement>(null);
+
+  const updateTitleHandler = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") {
+      setLoading(true);
+
+      try {
+        if (folderName !== folder?.name) {
+          const updatedFolder = await updateFolder({
+            folderId: folder?.id,
+            folderName,
+          });
+          if (updatedFolder) {
+            setEditing(false);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setEditing(false);
+        updateFolder({
+          folderId: folder?.id,
+          folderName,
+        });
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [folderName]);
   return (
     <li>
       <Collapsible
@@ -216,7 +323,7 @@ const FolderListItem = ({
               }`
             )}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center gap-3">
               <Image
                 src={
                   expandedFolders[folder.id]
@@ -239,11 +346,47 @@ const FolderListItem = ({
                   height={14}
                 />
               </div>
-              <p className="line-clamp-1 text-md">{folder.name}</p>
+              <div
+                ref={containerRef}
+                className="flex w-fit items-center justify-center gap-2"
+              >
+                {editing && !loading ? (
+                  <Input
+                    type="text"
+                    value={folderName}
+                    ref={inputRef}
+                    placeholder="Enter title"
+                    onChange={(e) => setFolderName(e.target.value)}
+                    onKeyDown={updateTitleHandler}
+                    disabled={!editing}
+                    className="folder-name-input"
+                  />
+                ) : (
+                  <>
+                    <p className="line-clamp-1 text-base">{folderName}</p>
+                  </>
+                )}
+
+                {!editing && (
+                  <Image
+                    src="/assets/icons/edit.svg"
+                    alt="edit"
+                    width={12}
+                    height={12}
+                    onClick={() => setEditing(true)}
+                    className="cursor-pointer"
+                  />
+                )}
+
+                {loading && <p className="text-sm text-gray-400">Saving...</p>}
+              </div>
             </div>
-            <p className="text-sm font-light text-blue-100">
-              Last Updated {dateConverter(folder.updatedAt)}
-            </p>
+            <div className="flex items-center gap-3">
+              <p className="text-sm font-light text-blue-100">
+                Last Updated {dateConverter(folder.updatedAt)}
+              </p>
+              <DeleteFolderModel folderId={folder?.id} />
+            </div>
           </div>
         </CollapsibleTrigger>
 
@@ -271,6 +414,7 @@ const FolderListItem = ({
                     metadata={doc.metadata}
                     createdAt={doc.createdAt}
                     usersAccesses={doc.usersAccesses}
+                    folderId={folder.id}
                   />
                 ))}
               </>
@@ -287,7 +431,13 @@ const FolderListItem = ({
   );
 };
 
-const DocumentListItem = ({ id, metadata, createdAt, usersAccesses }: any) => {
+const DocumentListItem = ({
+  id,
+  metadata,
+  createdAt,
+  usersAccesses,
+  folderId,
+}: any) => {
   return (
     <li className="document-list-item">
       <Link
@@ -309,7 +459,11 @@ const DocumentListItem = ({ id, metadata, createdAt, usersAccesses }: any) => {
           Created At {dateConverter(createdAt)}
         </p>
       </Link>
-      <DeleteModel roomId={id} users={usersAccesses} />
+      <DeleteModel
+        roomId={id}
+        users={Object.keys(usersAccesses)}
+        folderId={folderId}
+      />
     </li>
   );
 };

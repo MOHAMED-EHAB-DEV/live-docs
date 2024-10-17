@@ -39,6 +39,7 @@ export default function RootLayout({
           )}
         >
           <Provider>
+            <Analytics />
             <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
             {children}
             <Toaster />

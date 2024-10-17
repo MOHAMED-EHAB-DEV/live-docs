@@ -95,7 +95,11 @@ const Toolbar = ({
 
   const addFolderHandler = async () => {
     try {
-      const folder = await createFolder({ email, name: folderName, selectedFolder });
+      const folder = await createFolder({
+        email,
+        name: folderName,
+        selectedFolder,
+      });
 
       setFolderName("");
       setIsDialogOpened(false);
@@ -220,7 +224,78 @@ const Toolbar = ({
         </>
       ) : (
         <>
-          <Search search={search} setSearch={setSearch} />
+          <div className="flex items-center">
+            <Search search={search} setSearch={setSearch} />
+            <DropdownMenu onOpenChange={(open) => setOpen(open)}>
+              <DropdownMenuTrigger className="flex border-0 items-center w-fit justify-between gap-2 px-4 py-2 focus:ring-transparent outline-none">
+                <span>
+                  <Image
+                    src="/assets/icons/add.svg"
+                    alt="add"
+                    width={24}
+                    height={24}
+                  />
+                </span>
+                <Image
+                  src={arrowImage2}
+                  alt={Open ? "Dropdown Open" : "Dropdown Closed"}
+                  width={16}
+                  height={16}
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-black">
+                <Dialog
+                  open={isDialogOpened}
+                  onOpenChange={(open) => setIsDialogOpened(open)}
+                >
+                  <DialogTrigger className="text-white w-full hover:text-black hover:bg-white text-base font-medium p-2 flex items-center gap-2">
+                    <Image
+                      src="/assets/icons/folder.svg"
+                      alt="Folder Icon"
+                      width={16}
+                      height={16}
+                    />
+                    Folder
+                  </DialogTrigger>
+                  <DialogContent className="shad-dialog">
+                    <DialogHeader>
+                      <DialogTitle>Add Folder</DialogTitle>
+                      <DialogDescription>
+                        To add folder, please enter the name of the folder
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex items-center justify-start gap-2">
+                      <Input
+                        type="text"
+                        value={folderName}
+                        onChange={(e) => setFolderName(e.target.value)}
+                        placeholder="Enter Folder Name"
+                        className="bg-slate-900 text-slate-50 w-3/4 self-start"
+                      />
+                      <Button
+                        onClick={addFolderHandler}
+                        className="w-1/4 self-end hover:bg-transparent"
+                      >
+                        Create
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+                <DropdownMenuItem
+                  onClick={addDocumentHandler}
+                  className="text-white cursor-pointer text-base font-medium p-2 flex items-center justify-center gap-2"
+                >
+                  <Image
+                    src="/assets/icons/doc.svg"
+                    alt="Document"
+                    width={16}
+                    height={16}
+                  />
+                  Document
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <div className="flex items-center">
             <DropdownMenu onOpenChange={(open) => setIsDropdownOpen(open)}>
               <DropdownMenuTrigger className="flex border-0 items-center w-fit justify-between gap-2 px-4 py-2 focus:ring-transparent outline-none">

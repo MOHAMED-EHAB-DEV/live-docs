@@ -5,6 +5,7 @@ import Folder from "../models/folder";
 import SubFolder from "../models/subFolder";
 import { parseStringify } from "../utils";
 import { liveblocks } from "../liveblocks";
+import { redirect } from "next/navigation";
 
 export const createFolder = async ({
   email,
@@ -89,6 +90,7 @@ export const createFolder = async ({
     const folder = await Folder.findOne({ authorId: email });
 
     revalidatePath("/");
+    redirect('/');
 
     return parseStringify(folder);
   } catch (error) {

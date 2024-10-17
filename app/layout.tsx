@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 

@@ -5,6 +5,7 @@ import { parseStringify } from "../utils";
 import { liveblocks } from "../liveblocks";
 import { connectToDatabase } from "../database";
 import Documents from "../models/document";
+import { revalidatePath } from "next/cache";
 
 export const getUsers = async ({ userIds }: { userIds: string[] }) => {
   try {
@@ -99,6 +100,8 @@ export const UpdateUser = async (
       { email: actualEmail },
       { name, email, image }
     );
+
+    revalidatePath('/');
 
     return {
       message: "User Successfully Updated",

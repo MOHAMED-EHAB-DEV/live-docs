@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useUploadThing } from "@/lib/uploadthing";
+import { revalidatePath } from "next/cache";
 
 import { Button } from "./ui/button";
 import { UpdateUser } from "@/lib/actions/user.actions";
@@ -141,10 +142,6 @@ const UpdateProfile = ({
         variant: data?.updated ? "successive" : "destructive",
         description: data?.message,
       });
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     } catch (error) {
       console.error("Submitting failed:", error);
       toast({
@@ -163,7 +160,7 @@ const UpdateProfile = ({
       >
         Profile Picture
       </Label>
-      <div className="flex gap-8 items-center w-full">
+      <div className="flex gap-4 sm:gap-8 items-center w-full">
         <Image
           src={image}
           alt={user.name}

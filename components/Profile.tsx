@@ -57,7 +57,7 @@ const Profile = ({ user }: { user: IUser }) => {
         )}
       </div>
       <DropdownMenuSeparator className="h-[1px] w-full bg-[#2F2F33] my-4" />
-      <div className="flex items-center gap-6">
+      <div className="flex flex-col sm:flex-row items-center gap-6">
         <h3 className="text-white font-bold text-base">Connected accounts</h3>
         <div className="flex items-center justify-center gap-2">
           <Image

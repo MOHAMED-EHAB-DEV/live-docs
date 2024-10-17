@@ -216,7 +216,7 @@ const Documents = ({
             selectedFolder={selectedFolder}
           />
           <div className="document-list-empty">
-            <h4 className="text-base font-normal text-[#ffffffa6]">
+            <h4 className="sm:text-base text-base font-normal text-[#ffffffa6] w-full text-center">
               Looks like it&apos;s empty here! Tap the &apos;+&apos; icon to
               create a folder or document.
             </h4>
@@ -315,7 +315,7 @@ const FolderListItem = ({
         <CollapsibleTrigger asChild>
           <div
             className={cn(
-              "flex items-center justify-between gap-4 folder-list-item",
+              "flex items-center justify-between gap-2 sm:gap-4 folder-list-item",
               `${
                 folder.id === selectedFolder?.folderId
                   ? "bg-slate-200 bg-opacity-30"
@@ -363,7 +363,7 @@ const FolderListItem = ({
                   />
                 ) : (
                   <>
-                    <p className="line-clamp-1 text-base">{folderName}</p>
+                    <p className="line-clamp-1 text-sm sm:text-base">{folderName}</p>
                   </>
                 )}
 
@@ -381,8 +381,8 @@ const FolderListItem = ({
                 {loading && <p className="text-sm text-gray-400">Saving...</p>}
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <p className="text-sm font-light text-blue-100">
+            <div className="flex items-center justify-end gap-1 sm:gap-3">
+              <p className="text-xs sm:text-sm w-20 sm:w-fit font-light text-blue-100">
                 Last Updated {dateConverter(folder.updatedAt)}
               </p>
               <DeleteFolderModel folderId={folder?.id} />
@@ -419,7 +419,7 @@ const FolderListItem = ({
                 ))}
               </>
             ) : (
-              <h4 className="text-base font-normal text-[#ffffffa6] w-full text-center">
+              <h4 className="sm:text-base text-base font-normal text-[#ffffffa6] w-full text-center">
                 Looks like it&apos;s empty here! Tap the &apos;+&apos; icon to
                 create a folder or document.
               </h4>

@@ -32,7 +32,7 @@ const ShareModel = ({
   const [email, setEmail] = useState("");
   const [userType, setUserType] = useState<UserType>("viewer");
 
-  const shareDocumentHandler = async (type: string) => {
+  const shareDocumentHandler = async () => {
     setLoading(true);
 
     await updateDocumentAccess({

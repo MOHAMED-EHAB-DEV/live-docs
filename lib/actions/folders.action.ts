@@ -1,11 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import Folder from "../models/folder";
+import Folder, { IFolder } from "../models/folder";
 import SubFolder from "../models/subFolder";
 import { parseStringify } from "../utils";
+import { processFolder } from "../server-utils";
 import { liveblocks } from "../liveblocks";
-import { redirect } from "next/navigation";
 
 export const createFolder = async ({
   email,
@@ -21,6 +21,10 @@ export const createFolder = async ({
     parentId?: string;
   };
 }) => {
+  let returnedData = {
+    isSub: false,
+    folder: {},
+  };
   try {
     if (selectedFolder?.folderId) {
       const selectedFolderExists = await Folder.findOne({
@@ -36,6 +40,11 @@ export const createFolder = async ({
         });
 
         const newSubFolder = await subFolder.save();
+
+        returnedData = {
+          isSub: true,
+          folder: subFolder,
+        };
 
         const selectedFolderSubFolders = selectedFolderExists.subFolders;
         const updatedSelectedFolderSubFolders = [
@@ -62,6 +71,11 @@ export const createFolder = async ({
 
         const newSubFolder = await NewSubFolder.save();
 
+        returnedData = {
+          isSub: true,
+          folder: NewSubFolder,
+        };
+
         const subFolder = await SubFolder.findOne({
           _id: selectedFolder.folderId,
         });
@@ -85,20 +99,59 @@ export const createFolder = async ({
       });
 
       await newFolder.save();
+      returnedData = {
+        isSub: false,
+        folder: newFolder,
+      };
     }
 
-    const folder = await Folder.findOne({ authorId: email });
+    // const folder = await Folder.findOne({ authorId: email });
+
+    // revalidatePath("/");
+
+    // return parseStringify(folder);
 
     revalidatePath("/");
-    redirect('/');
+    // if (returnedData.isSub) {
+    //   const folder = await Folder.findOne({ _id: selectedFolder.folderId, authorId: email });
 
-    return parseStringify(folder);
+    //   if (folder?._id === returnedData?.folder?._id) {
+    //     return parseStringify(folder);
+    //   }
+
+    //   const subFolders = folder?.subFolders as Array<Object>;
+
+    //   for (const subFolder of subFolders) {
+    //     if (subFolder === returnedData?.folder?._id) {
+
+    //     }
+    //   }
+    // }
+    const folders = await Folder.find({ authorId: email });
+
+    const processedFolders: Object[] = [];
+
+    for (let i = 0; i < folders?.length; i++) {
+      const processedFolder: IFolder = await processFolder(folders[i]);
+
+      processedFolders.push(processedFolder);
+    }
+
+    return parseStringify(processedFolders);
   } catch (error) {
     console.log(`Error happened while we adding a folder: ${error}`);
   }
 };
 
-export const deleteFolder = async ({ folderId }: { folderId: string }) => {
+export const deleteFolder = async ({
+  folderId,
+  email,
+  isSubOperation,
+}: {
+  folderId: string;
+  email: string;
+  isSubOperation: Boolean;
+}) => {
   try {
     const folder = await Folder.findOne({ _id: folderId });
     const subFolder = await SubFolder.findOne({ _id: folderId });
@@ -111,6 +164,14 @@ export const deleteFolder = async ({ folderId }: { folderId: string }) => {
 
         await liveblocks.deleteRoom(roomId);
       }
+
+      for (let i = 0; i < folder?.subFolders.length; i++) {
+        await deleteFolder({
+          folderId: folder?.subFolders[i]._id as string,
+          email,
+          isSubOperation: true,
+        });
+      }
     } else if (subFolder) {
       await SubFolder.findOneAndDelete({ _id: folderId });
       for (let i = 0; i < subFolder?.documents.length; i++) {
@@ -118,9 +179,32 @@ export const deleteFolder = async ({ folderId }: { folderId: string }) => {
 
         await liveblocks.deleteRoom(roomId);
       }
+      for (let i = 0; i < subFolder?.subFolders.length; i++) {
+        await deleteFolder({
+          folderId: subFolder?.subFolders[i]._id as string,
+          email,
+          isSubOperation: true,
+        });
+      }
+    }
+
+    if (isSubOperation) {
+      return;
+    }
+
+    const folders = await Folder.find({ authorId: email });
+
+    const processedFolders: IFolder[] = [];
+
+    for (let i = 0; i < folders?.length; i++) {
+      const processedFolder: IFolder = await processFolder(folders[i]);
+
+      processedFolders.push(processedFolder);
     }
 
     revalidatePath("/");
+
+    return parseStringify(folders);
   } catch (error) {
     console.log(`Error while deleting folder: ${error}`);
   }
@@ -151,7 +235,7 @@ export const updateFolder = async ({
           name: folderName,
         }
       );
-    };
+    }
 
     revalidatePath("/");
 

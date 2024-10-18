@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -165,6 +165,7 @@ const Documents = ({
             userId={user._id as string}
             email={user.email}
             selectedFolder={selectedFolder}
+            setFolders={setRoomDocuments}
           />
 
           <div className="flex flex-col w-full max-w-[730px] gap-2">
@@ -178,6 +179,7 @@ const Documents = ({
                   handleSubFolderClick={handleSubfolderClick}
                   selectedFolder={selectedFolder}
                   isSubFolder={false}
+                  setFolders={setRoomDocuments}
                 />
               ))}
             </ul>
@@ -214,6 +216,7 @@ const Documents = ({
             userId={user._id as string}
             email={user.email}
             selectedFolder={selectedFolder}
+            setFolders={setRoomDocuments}
           />
           <div className="document-list-empty">
             <h4 className="sm:text-base text-base font-normal text-[#ffffffa6] w-full text-center">
@@ -235,6 +238,7 @@ const FolderListItem = ({
   selectedFolder,
   isSubFolder,
   parentFolder,
+  setFolders,
 }: {
   folder: any;
   handleFolderClick: (folder: any, parentFolder?: any) => void;
@@ -250,6 +254,12 @@ const FolderListItem = ({
   } | null;
   isSubFolder: Boolean;
   parentFolder?: any;
+  setFolders: Dispatch<
+    SetStateAction<{
+      documents: any[];
+      folders: any[];
+    }>
+  >;
 }) => {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -302,6 +312,7 @@ const FolderListItem = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [folderName]);
+
   return (
     <li>
       <Collapsible
@@ -363,7 +374,9 @@ const FolderListItem = ({
                   />
                 ) : (
                   <>
-                    <p className="line-clamp-1 text-sm sm:text-base">{folderName}</p>
+                    <p className="line-clamp-1 text-sm sm:text-base">
+                      {folderName}
+                    </p>
                   </>
                 )}
 
@@ -385,7 +398,11 @@ const FolderListItem = ({
               <p className="text-xs sm:text-sm w-20 sm:w-fit font-light text-blue-100">
                 Last Updated {dateConverter(folder.updatedAt)}
               </p>
-              <DeleteFolderModel folderId={folder?.id} />
+              <DeleteFolderModel
+                folderId={folder?.id}
+                email={folder?.authorId}
+                setFolders={setFolders}
+              />
             </div>
           </div>
         </CollapsibleTrigger>
@@ -404,6 +421,7 @@ const FolderListItem = ({
                     selectedFolder={selectedFolder}
                     isSubFolder={true}
                     parentFolder={folder}
+                    setFolders={setFolders}
                   />
                 ))}
 

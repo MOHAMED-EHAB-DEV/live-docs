@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import Image from "next/image";
 
 import {
@@ -16,7 +16,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { deleteFolder } from "@/lib/actions/folders.action";
 
-const DeleteFolderModel = ({ folderId }: { folderId: string }) => {
+const DeleteFolderModel = ({
+  folderId,
+  email,
+  setFolders
+}: {
+  folderId: string;
+  email: string;
+  setFolders: Dispatch<
+    SetStateAction<{
+      documents: any[];
+      folders: any[];
+    }>
+  >;
+}) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +37,15 @@ const DeleteFolderModel = ({ folderId }: { folderId: string }) => {
     setLoading(true);
 
     try {
-      await deleteFolder({ folderId });
+      const folders = await deleteFolder({ folderId, email, isSubOperation: false });
+      
+      setFolders((prev) => {
+        return {
+          ...prev,
+          folders,
+        }
+      });
+      
       setOpen(false);
     } catch (error) {
       console.log("Error notif:", error);

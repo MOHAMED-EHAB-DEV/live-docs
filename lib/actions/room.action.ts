@@ -4,6 +4,7 @@ import { nanoid } from "nanoid";
 import { liveblocks } from "../liveblocks";
 import { revalidatePath } from "next/cache";
 import { getAccessType, parseStringify } from "../utils";
+import { processFolder } from "../server-utils";
 import { redirect } from "next/navigation";
 import { UpdateDocuments } from "./documents.action";
 import Documents from "../models/document";
@@ -101,44 +102,6 @@ export const getDocuments = async (email: string) => {
         processedDocuments.push(processedDoc);
       }
     }
-
-    const processFolder = async (folder: any): Promise<IFolder> => {
-      const processedFolder: IFolder = {
-        id: folder?._id?.toString(),
-        name: folder?.name,
-        updatedAt: folder?.updatedAt,
-        authorId: folder.authorId,
-        documents: [],
-        subFolders: [],
-      };
-
-      if (folder?.documents?.length > 0) {
-        for (let i = 0; i < folder?.documents?.length; i++) {
-          const doc = folder?.documents[i];
-
-          const processedDoc = await getDocument({
-            roomId: doc?.id,
-            userId: email,
-          });
-
-          processedFolder.documents.push(processedDoc);
-        }
-      }
-
-      if (folder?.subFolders?.length > 0) {
-        for (let i = 0; i < folder?.subFolders?.length; i++) {
-          const subFolder = await SubFolder.findOne({
-            _id: folder.subFolders[i],
-          });
-          if (subFolder) {
-            const processedSubFolder = await processFolder(subFolder);
-            processedFolder.subFolders.push(processedSubFolder);
-          }
-        }
-      }
-
-      return processedFolder;
-    };
 
     const processedFolders: IFolder[] = [];
 

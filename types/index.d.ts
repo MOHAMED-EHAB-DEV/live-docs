@@ -87,6 +87,7 @@ declare type CollaborativeRoomProps = {
   users: User[];
   currentUserType: UserType;
   currentUser: IUser;
+  folderId: string;
 };
 
 declare type AddDocumentBtnProps = {

@@ -35,11 +35,13 @@ function Placeholder() {
 export function Editor({
   roomId,
   currentUserType,
-  users
+  users,
+  folderId,
 }: {
   roomId: string;
   currentUserType: UserType;
-  users: User[]
+  users: User[];
+  folderId: string,
 }) {
   const status = useEditorStatus();
   const { threads } = useThreads();
@@ -55,12 +57,16 @@ export function Editor({
     editable: currentUserType === "editor",
   });
 
+  console.log(users, "users");
+
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <div className="editor-container size-full">
         <div className="toolbar-wrapper flex min-w-full justify-between">
           <ToolbarPlugin />
-          {currentUserType === 'editor' && <DeleteModel roomId={roomId} users={users} />}
+          {currentUserType === "editor" && (
+            <DeleteModel roomId={roomId} users={users} isDashboard={false} folderId={folderId} />
+          )}
         </div>
 
         <div className="editor-wrapper flex flex-col items-center justify-start">

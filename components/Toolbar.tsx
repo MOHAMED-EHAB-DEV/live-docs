@@ -50,7 +50,7 @@ const Toolbar = ({
   email,
   userId,
   selectedFolder,
-  setFolders,
+  setData,
 }: {
   isDocuments: Boolean;
   search: string;
@@ -69,7 +69,7 @@ const Toolbar = ({
     folderName: string;
     parentId?: string;
   };
-  setFolders: Dispatch<
+  setData: Dispatch<
     SetStateAction<{
       documents: any[];
       folders: any[];
@@ -128,7 +128,7 @@ const Toolbar = ({
         selectedFolder,
       });
 
-      setFolders((prev) => {
+      setData((prev) => {
         return {
           ...prev,
           folders,

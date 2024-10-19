@@ -246,3 +246,33 @@ export const updateFolder = async ({
     return false;
   }
 };
+
+export const getDocumentFolder = async (email: string, roomId: string) => {
+  try {
+    let folderId = "";
+    const folders = await Folder.find({ authorId: email });
+    const subFolders = await SubFolder.find({ authorId: email });
+
+    folders.forEach(({ documents, _id }: any) => {
+      const document = documents.filter((id: string) => roomId === id);
+
+      if (document) {
+        folderId = _id;
+      }
+    });
+
+    subFolders.forEach(({ documents, _id }: any) => {
+      const document = documents.filter((id: string) => roomId === id);
+
+      if (document) {
+        folderId = _id;
+      }
+    });
+
+    return folderId;
+  } catch (error) {
+    console.log(
+      `Error happened while getting document in a specific folder: ${error}`
+    );
+  }
+};

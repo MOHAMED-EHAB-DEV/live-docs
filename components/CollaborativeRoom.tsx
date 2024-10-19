@@ -18,7 +18,8 @@ const CollaborativeRoom = ({
   roomMetadata,
   users,
   currentUserType,
-  currentUser
+  currentUser,
+  folderId,
 }: CollaborativeRoomProps) => {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -128,7 +129,7 @@ const CollaborativeRoom = ({
               <UserDropdown user={currentUser} />
             </div>
           </Header>
-          <Editor roomId={roomId} currentUserType={currentUserType} users={users} />
+          <Editor roomId={roomId} currentUserType={currentUserType} users={users} folderId={folderId} />
         </div>
       </ClientSideSuspense>
     </RoomProvider>

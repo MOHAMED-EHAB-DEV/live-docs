@@ -165,7 +165,7 @@ const Documents = ({
             userId={user._id as string}
             email={user.email}
             selectedFolder={selectedFolder}
-            setFolders={setRoomDocuments}
+            setData={setRoomDocuments}
           />
 
           <div className="flex flex-col w-full max-w-[730px] gap-2">
@@ -192,6 +192,7 @@ const Documents = ({
                     createdAt={createdAt}
                     usersAccesses={usersAccesses}
                     key={id}
+                    setDocuments={setRoomDocuments}
                   />
                 )
               )}
@@ -216,7 +217,7 @@ const Documents = ({
             userId={user._id as string}
             email={user.email}
             selectedFolder={selectedFolder}
-            setFolders={setRoomDocuments}
+            setData={setRoomDocuments}
           />
           <div className="document-list-empty">
             <h4 className="sm:text-base text-base font-normal text-[#ffffffa6] w-full text-center">
@@ -433,6 +434,7 @@ const FolderListItem = ({
                     createdAt={doc.createdAt}
                     usersAccesses={doc.usersAccesses}
                     folderId={folder.id}
+                    setDocuments={setFolders}
                   />
                 ))}
               </>
@@ -455,6 +457,7 @@ const DocumentListItem = ({
   createdAt,
   usersAccesses,
   folderId,
+  setDocuments
 }: any) => {
   return (
     <li className="document-list-item">
@@ -481,6 +484,8 @@ const DocumentListItem = ({
         roomId={id}
         users={Object.keys(usersAccesses)}
         folderId={folderId}
+        setDocuments={setDocuments}
+        isDashboard={true}
       />
     </li>
   );

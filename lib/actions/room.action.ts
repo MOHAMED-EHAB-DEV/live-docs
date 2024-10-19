@@ -210,16 +210,22 @@ export const deleteDocument = async (
   roomId: string,
   users: Array<String>,
   isFolder?: Boolean,
-  folderId?: string
+  folderId?: string,
+  isDashboard?: Boolean
 ) => {
   try {
+    let returnedDocuments;
     await liveblocks.deleteRoom(roomId);
 
-    users?.forEach(async (email) => {
+    users?.forEach(async (item) => {
       if (isFolder) {
-        const folder = await Folder.findOne({ authorId: email, _id: folderId });
+        console.log(isFolder, "Folder");
+        const folder = await Folder.findOne({
+          authorId: isDashboard ? item : item?.email,
+          _id: folderId,
+        });
         const subFolder = await SubFolder.findOne({
-          authorId: email,
+          authorId: isDashboard ? item : item?.email,
           _id: folderId,
         });
 
@@ -229,7 +235,7 @@ export const deleteDocument = async (
           );
 
           await Folder.findOneAndUpdate(
-            { authorId: email, _id: folderId },
+            { authorId: isDashboard ? item : item?.email, _id: folderId },
             {
               documents: filteredDocuments,
             }
@@ -240,22 +246,23 @@ export const deleteDocument = async (
           );
 
           await SubFolder.findOneAndUpdate(
-            { authorId: email, _id: folderId },
+            { authorId: isDashboard ? item : item?.email, _id: folderId },
             {
               documents: filteredDocuments,
             }
           );
         }
       } else {
-        const documents = await Documents.findOne({ authorEmail: email });
+        const documents = await Documents.findOne({ authorEmail: isDashboard ? item : item?.email });
         if (documents) {
           const document = documents.documents;
           const updatedDocuments = document.filter(
             (doc: any) => doc.id !== roomId
           );
+          returnedDocuments = updatedDocuments;
 
           await Documents.findOneAndUpdate(
-            { authorEmail: email },
+            { authorEmail: isDashboard ? item : item?.email },
             { documents: updatedDocuments }
           );
         }
@@ -263,7 +270,12 @@ export const deleteDocument = async (
     });
 
     revalidatePath("/");
-    redirect("/");
+
+    if (isDashboard) {
+      return parseStringify(returnedDocuments);
+    } else {
+      redirect("/");
+    }
   } catch (error) {
     console.log(`Error happened while deleting a document: ${error}`);
   }

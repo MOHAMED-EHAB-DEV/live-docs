@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import Image from "next/image";
 
 import {
@@ -20,10 +20,19 @@ const DeleteModel = ({
   roomId,
   users,
   folderId,
+  setDocuments,
+  isDashboard,
 }: {
   roomId: string;
   users: Array<String>;
   folderId?: string;
+  setDocuments: Dispatch<
+    SetStateAction<{
+      documents: any[];
+      folders: any[];
+    }>
+  >;
+  isDashboard: Boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,7 +41,17 @@ const DeleteModel = ({
     setLoading(true);
 
     try {
-      await deleteDocument(roomId, users, folderId ? true : false, folderId);
+      const documents = await deleteDocument(roomId, users, folderId ? true : false, folderId, isDashboard);
+      
+      if (isDashboard) {
+        setDocuments((prev) => {
+          return {
+            ...prev,
+            documents,
+          }
+        })
+      }
+
       setOpen(false);
     } catch (error) {
       console.log("Error notif:", error);

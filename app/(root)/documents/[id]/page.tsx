@@ -5,11 +5,14 @@ import CollaborativeRoom from "@/components/CollaborativeRoom";
 import { getDocument } from "@/lib/actions/room.action";
 import { getUser, getUsers } from "@/lib/actions/user.actions";
 import { authOptions } from "@/auth";
+import { getDocumentFolder } from "@/lib/actions/folders.action";
 
 const page = async ({ params: { id } }: SearchParamProps) => {
   const session = await getServerSession(authOptions);
   const user = await getUser({ email: session?.user.email! });
   if (!user) redirect("/sign-in");
+
+  const folderId = await getDocumentFolder(user?.email, id);
 
   const room = await getDocument({
     roomId: id,
@@ -42,6 +45,7 @@ const page = async ({ params: { id } }: SearchParamProps) => {
         users={usersData}
         currentUserType={currentUserType}
         currentUser={user as IUser}
+        folderId={folderId as string}
       />
     </main>
   );

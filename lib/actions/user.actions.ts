@@ -6,6 +6,8 @@ import { liveblocks } from "../liveblocks";
 import { connectToDatabase } from "../database";
 import Documents from "../models/document";
 import { revalidatePath } from "next/cache";
+import { deleteFolder } from "./folders.action";
+import { deleteDocument } from "./room.action";
 
 export const getUsers = async ({ userIds }: { userIds: string[] }) => {
   try {
@@ -101,7 +103,7 @@ export const UpdateUser = async (
       { name, email, image }
     );
 
-    revalidatePath('/');
+    revalidatePath("/");
 
     return {
       message: "User Successfully Updated",
@@ -123,6 +125,14 @@ export const DeleteUser = async ({ email }: { email: string }) => {
 
     const deletedUser = await User.findOneAndDelete({ email });
 
+    deletedUser?.folders.forEach(async (folder) => {
+      const id = folder?.id;
+
+      await deleteFolder({ folderId: id, email, isSubOperation: true });
+    });
+
+    await DeleteDocumentUser(email);
+
     return {
       message: "Account deleted",
       deleted: true,
@@ -132,3 +142,14 @@ export const DeleteUser = async ({ email }: { email: string }) => {
     console.log(`Error deleting your user: ${error}`);
   }
 };
+
+
+export const DeleteDocumentUser = async (email: string) => {
+  try {
+    await Documents.findOneAndDelete({ authorEmail: email });
+
+    return;
+  } catch (error) {
+    console.log(`Error while delete documents for a user: ${error}`);
+  }
+}

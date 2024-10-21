@@ -10,6 +10,7 @@ import { UpdateDocuments } from "./documents.action";
 import Documents from "../models/document";
 import Folder, { IFolder } from "../models/folder";
 import SubFolder from "../models/subFolder";
+import User from "../models/user";
 
 export const createDocument = async ({
   userId,
@@ -127,6 +128,12 @@ export const updateDocumentAccess = async ({
   updatedBy,
 }: ShareDocumentParams) => {
   try {
+    const UserExists = await User.findOne({ email });
+
+    if (!UserExists) {
+      throw new Error("This User doesn't exists");
+    }
+
     const usersAccesses: RoomAccesses = {
       [email]: getAccessType(userType) as AccessType,
     };

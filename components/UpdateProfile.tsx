@@ -39,7 +39,7 @@ const UpdateProfile = ({
       toast({
         variant: "successive",
         description:
-          "Profile photo updated successfully!\nPlease Reload the page to apply the changes.",
+          "Profile photo uploaded Successfully",
       });
     },
   });

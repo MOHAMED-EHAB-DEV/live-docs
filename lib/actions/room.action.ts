@@ -221,7 +221,7 @@ export const deleteDocument = async (
   isDashboard?: Boolean
 ) => {
   try {
-    let returnedDocuments;
+    let returnedDocuments = [];
     await liveblocks.deleteRoom(roomId);
 
     users?.forEach(async (item) => {

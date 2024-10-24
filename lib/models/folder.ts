@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IFolder extends Document {
+  id: string;
   name: string;
   updatedAt: Date;
   documents: Array<Object>;

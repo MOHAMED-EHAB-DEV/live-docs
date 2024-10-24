@@ -5,7 +5,7 @@ import SubFolder from "./models/subFolder";
 import { getDocument } from "./actions/room.action";
 
 export const processFolder = async (folder: any): Promise<IFolder> => {
-  const processedFolder: IFolder = {
+  const processedFolder = {
     id: folder?._id?.toString(),
     name: folder?.name,
     updatedAt: folder?.updatedAt,

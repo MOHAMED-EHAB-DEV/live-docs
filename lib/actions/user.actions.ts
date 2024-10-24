@@ -8,6 +8,7 @@ import Documents from "../models/document";
 import { revalidatePath } from "next/cache";
 import { deleteFolder } from "./folders.action";
 import { deleteDocument } from "./room.action";
+import Folder from "../models/folder";
 
 export const getUsers = async ({ userIds }: { userIds: string[] }) => {
   try {
@@ -124,11 +125,12 @@ export const DeleteUser = async ({ email }: { email: string }) => {
     await connectToDatabase();
 
     const deletedUser = await User.findOneAndDelete({ email });
+    const folders = await Folder.find({ authorId: email });
 
-    deletedUser?.folders.forEach(async (folder) => {
-      const id = folder?.id;
+    folders?.forEach(async (folder) => {
+      const id = folder?._id?.toString();
 
-      await deleteFolder({ folderId: id, email, isSubOperation: true });
+      await deleteFolder({ folderId: id as string, email, isSubOperation: true });
     });
 
     await DeleteDocumentUser(email);

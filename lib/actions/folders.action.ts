@@ -6,6 +6,7 @@ import SubFolder from "../models/subFolder";
 import { parseStringify } from "../utils";
 import { processFolder } from "../server-utils";
 import { liveblocks } from "../liveblocks";
+import User from "../models/user";
 
 export const createFolder = async ({
   email,
@@ -21,6 +22,12 @@ export const createFolder = async ({
     parentId?: string;
   };
 }) => {
+  const UserExists = await User.findOne({ email });
+
+  if (!UserExists) {
+    throw new Error("User doesn't exists");
+  }
+
   let returnedData = {
     isSub: false,
     folder: {},
@@ -105,28 +112,8 @@ export const createFolder = async ({
       };
     }
 
-    // const folder = await Folder.findOne({ authorId: email });
-
-    // revalidatePath("/");
-
-    // return parseStringify(folder);
-
     revalidatePath("/");
-    // if (returnedData.isSub) {
-    //   const folder = await Folder.findOne({ _id: selectedFolder.folderId, authorId: email });
 
-    //   if (folder?._id === returnedData?.folder?._id) {
-    //     return parseStringify(folder);
-    //   }
-
-    //   const subFolders = folder?.subFolders as Array<Object>;
-
-    //   for (const subFolder of subFolders) {
-    //     if (subFolder === returnedData?.folder?._id) {
-
-    //     }
-    //   }
-    // }
     const folders = await Folder.find({ authorId: email });
 
     const processedFolders: Object[] = [];
@@ -204,7 +191,7 @@ export const deleteFolder = async ({
 
     revalidatePath("/");
 
-    return parseStringify(folders);
+    return parseStringify(processedFolders);
   } catch (error) {
     console.log(`Error while deleting folder: ${error}`);
   }

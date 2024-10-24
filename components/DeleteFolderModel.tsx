@@ -38,7 +38,7 @@ const DeleteFolderModel = ({
 
     try {
       const folders = await deleteFolder({ folderId, email, isSubOperation: false });
-      
+
       setFolders((prev) => {
         return {
           ...prev,

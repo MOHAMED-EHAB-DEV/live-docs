@@ -9,18 +9,8 @@ export interface IUser extends Document {
   image?: string;
   provider: String;
   createdAt: Date;
-  folders: Array<IFolder>;
   verified: Boolean;
 }
-
-const subFSchema = new Schema(
-  {
-    id: {
-      type: String,
-    },
-  },
-  { _id: false }
-);
 
 const userSchema = new Schema<IUser>(
   {
@@ -44,7 +34,6 @@ const userSchema = new Schema<IUser>(
       type: Date,
       default: Date.now,
     },
-    folders: [subFSchema],
     verified: {
       type: Boolean,
       default: false,

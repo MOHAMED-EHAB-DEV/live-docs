@@ -146,7 +146,7 @@ export const DeleteUser = async ({ email }: { email: string }) => {
 };
 
 
-export const DeleteDocumentUser = async (email: string) => {
+export const DeleteDocumentUser = async (email: String) => {
   try {
     await Documents.findOneAndDelete({ authorEmail: email });
 

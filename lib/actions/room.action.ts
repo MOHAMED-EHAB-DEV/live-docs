@@ -11,6 +11,7 @@ import Documents from "../models/document";
 import Folder, { IFolder } from "../models/folder";
 import SubFolder from "../models/subFolder";
 import User from "../models/user";
+import { DeleteDocumentUser } from "./user.actions";
 
 export const createDocument = async ({
   userId,
@@ -221,7 +222,7 @@ export const deleteDocument = async (
   isDashboard?: Boolean
 ) => {
   try {
-    let returnedDocuments = [];
+    let returnedDocuments: Object[] = [];
     await liveblocks.deleteRoom(roomId);
 
     users?.forEach(async (item) => {
@@ -260,18 +261,25 @@ export const deleteDocument = async (
           );
         }
       } else {
-        const documents = await Documents.findOne({ authorEmail: isDashboard ? item : item?.email });
+        const documents = await Documents.findOne({
+          authorEmail: isDashboard ? item : item?.email,
+        });
         if (documents) {
           const document = documents.documents;
           const updatedDocuments = document.filter(
             (doc: any) => doc.id !== roomId
           );
-          returnedDocuments = updatedDocuments;
 
-          await Documents.findOneAndUpdate(
-            { authorEmail: isDashboard ? item : item?.email },
-            { documents: updatedDocuments }
-          );
+          if (updatedDocuments.length === 0) {
+            await DeleteDocumentUser(documents?.authorEmail);
+          } else {
+            returnedDocuments = updatedDocuments;
+
+            await Documents.findOneAndUpdate(
+              { authorEmail: isDashboard ? item : item?.email },
+              { documents: updatedDocuments }
+            );
+          }
         }
       }
     });

@@ -68,7 +68,6 @@ const CollaborativeRoom = ({
     };
   }, [documentTitle, roomId]);
 
-
   useEffect(() => {
     if (editing && inputRef.current) {
       inputRef.current.focus();
@@ -129,7 +128,12 @@ const CollaborativeRoom = ({
               <UserDropdown user={currentUser} />
             </div>
           </Header>
-          <Editor roomId={roomId} currentUserType={currentUserType} users={users} folderId={folderId} />
+          <Editor
+            roomId={roomId}
+            currentUserType={currentUserType}
+            users={users}
+            folderId={folderId}
+          />
         </div>
       </ClientSideSuspense>
     </RoomProvider>

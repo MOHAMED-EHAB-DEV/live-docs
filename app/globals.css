@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 
 @import "@liveblocks/react-ui/styles.css";
 @import "@liveblocks/react-lexical/styles.css";
@@ -96,7 +96,7 @@
   }
 
   .editor-wrapper {
-    @apply custom-scrollbar h-[calc(100vh-140px)] gap-5 overflow-auto px-5 pt-5 lg:flex-row lg:items-start lg:justify-center  xl:gap-10 xl:pt-10;
+    @apply custom-scrollbar h-[calc(100vh-140px)] overflow-auto px-5 pt-5 lg:flex-row lg:items-start lg:justify-center xl:gap-10 xl:pt-10;
   }
 
   .header {
@@ -114,7 +114,7 @@
   .document-list-item {
     @apply flex items-center h-11 justify-between gap-4 rounded-lg bg-doc bg-cover p-5 shadow-xl;
   }
-  
+
   .folder-list-item {
     @apply flex items-center h-8 justify-between gap-4 rounded-lg p-5 hover:bg-slate-300 hover:bg-opacity-30 bg-opacity-30 transition;
   }
@@ -126,7 +126,7 @@
   .document-title-input {
     @apply min-w-[78px] border-none bg-transparent px-0 text-left text-base font-semibold leading-[24px] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:text-black sm:text-xl md:text-center !important;
   }
-  
+
   .folder-name-input {
     @apply w-[150px] border-none bg-transparent px-0 text-left text-base focus-visible:ring-0 focus-visible:ring-offset-0 disabled:text-black sm:text-xl md:text-center !important;
   }
@@ -140,7 +140,7 @@
   }
 
   .collaborators-list {
-    @apply hidden items-center justify-end -space-x-3 overflow-hidden sm:flex;
+    @apply hidden items-center justify-end -space-x-3 overflow-hidden sm:flex list-none;
   }
 
   .share-input {
@@ -180,7 +180,7 @@
   .document-ul {
     @apply flex w-full max-w-[730px] flex-col gap-1;
   }
-  
+
   .folder-ul {
     @apply flex w-full max-w-[730px] flex-col;
   }

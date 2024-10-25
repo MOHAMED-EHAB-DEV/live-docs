@@ -7,7 +7,13 @@ import { getUser, getUsers } from "@/lib/actions/user.actions";
 import { authOptions } from "@/auth";
 import { getDocumentFolder } from "@/lib/actions/folders.action";
 
-const page = async ({ params: { id } }: SearchParamProps) => {
+const page = async (props: SearchParamProps) => {
+  const params = await props.params;
+
+  const {
+    id
+  } = params;
+
   const session = await getServerSession(authOptions);
   const user = await getUser({ email: session?.user.email! });
   if (!user) redirect("/sign-in");

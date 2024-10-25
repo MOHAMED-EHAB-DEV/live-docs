@@ -38,7 +38,15 @@ export const getUser = async ({ email }: { email: string }) => {
 
     const user = await User.findOne({ email });
 
-    return user;
+    return {
+      _id: `${user?._id}`,
+      name: user?.name,
+      email: user?.email,
+      image: user?.image,
+      provider: user?.provider,
+      createdAt: user?.createdAt,
+      verified: user?.verified,
+    };
   } catch (error) {
     console.log(`Error getting a user: ${error}`);
   }

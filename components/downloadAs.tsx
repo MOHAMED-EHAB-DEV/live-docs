@@ -3,10 +3,11 @@ import { saveAs } from "file-saver";
 
 const MarkdownDownloader = () => {
     const room = useRoom();
-    const documentContent = useStorage((root) => root.document?.content);
+    const documentContent = useStorage((root) => root.document);
 
     const downloadAsMarkdown = () => {
-        const markdownContent = documentContent;
+        console.log(documentContent, "Document Content")
+        const markdownContent = documentContent?.content;
 
         const blob = new Blob([markdownContent], { type: "text/markdown;charset=utf-8" });
         saveAs(blob, `${room?.info?.name}.md`); // FileSaver's saveAs function to download the file

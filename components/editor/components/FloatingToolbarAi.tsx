@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { CoreMessage } from "ai";
-import { useSelection } from "../hooks/useSelection";
+import { useSelection } from "@/hooks/useSelection";
 import { continueConversation } from "../actions/ai";
 import { readStreamableValue } from "ai/rsc";
 import {

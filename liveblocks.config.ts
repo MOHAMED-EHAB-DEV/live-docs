@@ -48,6 +48,7 @@ declare global {
       // Example, rooms with a title and url
       // title: string;
       // url: string;
+      title: string;
     };
   }
 }

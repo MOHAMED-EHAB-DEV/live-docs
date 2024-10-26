@@ -1,5 +1,5 @@
 import useSWRInfinite from "swr/infinite";
-import { getRoomsAndInfo } from "@/lib/actions/liveblocks";
+import { getRoomsAndInfo } from "../actions/liveblocks";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 

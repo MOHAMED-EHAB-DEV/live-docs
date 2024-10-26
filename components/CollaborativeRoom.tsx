@@ -58,7 +58,6 @@ const CollaborativeRoom = ({
       ) {
         setEditing(false);
         updateDocument(roomId, documentTitle);
-        console.log(editing);
       }
     };
 
@@ -119,7 +118,7 @@ const CollaborativeRoom = ({
               {loading && <p className="text-sm text-gray-400">Saving...</p>}
             </div>
             <div className="flex w-full flex-1 justify-end gap-2 sm:gap-3">
-              {/* <MarkdownDownloader /> */}
+              {/* <MarkdownDownloader roomId={roomId} userId={currentUser?.email} /> */}
               <ActiveCollaborators authorId={currentUser?.email} />
               <ShareModel
                 roomId={roomId}

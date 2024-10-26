@@ -11,8 +11,8 @@ import {
   useFloating,
 } from "@floating-ui/react-dom";
 import { FloatingToolbarAi } from "./FloatingToolbarAi";
-import { useRange } from "../hooks/useRange";
-import { useMouseListener } from "../hooks/useMouseListener";
+import { useRange } from "@/hooks/useRange";
+import { useMouseListener } from "@/hooks/useMouseListener";
 import { FloatingToolbarOptions } from "./FloatingToolbarOptions";
 
 const MARGIN_X = 32;

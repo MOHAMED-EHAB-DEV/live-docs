@@ -12,7 +12,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { MouseEventHandler, ReactNode, useCallback } from "react";
 import { $setBlocksType } from "@lexical/selection";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
-import { useActiveBlock } from "../hooks/useActiveBlock";
+import { useActiveBlock } from "@/hooks/useActiveBlock";
 import { ItalicIcon } from "../icons/ItalicIcon";
 import { UnderlineIcon } from "../icons/UnderlineIcon";
 import { StrikethroughIcon } from "../icons/StrikethroughIcon";

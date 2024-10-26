@@ -41,6 +41,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "file-saver": "^2.0.5",
     "framer-motion": "^11.11.10",
     "jsm-editor": "^0.0.12",
     "jsonwebtoken": "^9.0.2",

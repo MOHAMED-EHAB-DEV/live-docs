@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ClientSideSuspense, RoomProvider } from "@liveblocks/react/suspense";
-import UserDropdown from "@/components/UserDropdown";
 
+import UserDropdown from "@/components/UserDropdown";
 import { Input } from "./ui/input";
 import { Editor } from "@/components/editor/Editor";
 import Header from "@/components/Header";
@@ -12,6 +12,7 @@ import ActiveCollaborators from "./ActiveCollaborators";
 import { updateDocument } from "@/lib/actions/room.action";
 import Loader from "./Loader";
 import ShareModel from "./ShareModel";
+import MarkdownDownloader from "./downloadAs";
 
 const CollaborativeRoom = ({
   roomId,
@@ -118,6 +119,7 @@ const CollaborativeRoom = ({
               {loading && <p className="text-sm text-gray-400">Saving...</p>}
             </div>
             <div className="flex w-full flex-1 justify-end gap-2 sm:gap-3">
+              {/* <MarkdownDownloader /> */}
               <ActiveCollaborators authorId={currentUser?.email} />
               <ShareModel
                 roomId={roomId}

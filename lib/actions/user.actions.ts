@@ -38,15 +38,17 @@ export const getUser = async ({ email }: { email: string }) => {
 
     const user = await User.findOne({ email });
 
-    return {
-      _id: `${user?._id}`,
-      name: user?.name,
-      email: user?.email,
-      image: user?.image,
-      provider: user?.provider,
-      createdAt: user?.createdAt,
-      verified: user?.verified,
-    };
+    return user
+      ? {
+          _id: `${user?._id}`,
+          name: user?.name,
+          email: user?.email,
+          image: user?.image,
+          provider: user?.provider,
+          createdAt: user?.createdAt,
+          verified: user?.verified,
+        }
+      : undefined;
   } catch (error) {
     console.log(`Error getting a user: ${error}`);
   }
@@ -138,7 +140,11 @@ export const DeleteUser = async ({ email }: { email: string }) => {
     folders?.forEach(async (folder) => {
       const id = folder?._id?.toString();
 
-      await deleteFolder({ folderId: id as string, email, isSubOperation: true });
+      await deleteFolder({
+        folderId: id as string,
+        email,
+        isSubOperation: true,
+      });
     });
 
     await DeleteDocumentUser(email);
@@ -153,7 +159,6 @@ export const DeleteUser = async ({ email }: { email: string }) => {
   }
 };
 
-
 export const DeleteDocumentUser = async (email: String) => {
   try {
     await Documents.findOneAndDelete({ authorEmail: email });
@@ -162,4 +167,4 @@ export const DeleteDocumentUser = async (email: String) => {
   } catch (error) {
     console.log(`Error while delete documents for a user: ${error}`);
   }
-}
+};

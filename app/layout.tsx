@@ -40,7 +40,8 @@ export default function RootLayout({
           )}
         >
           <Provider>
-            <Analytics /><SpeedInsights />
+            <Analytics />
+            <SpeedInsights />
             <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
             {children}
             <Toaster />

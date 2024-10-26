@@ -3,6 +3,7 @@ import { Inter as FontSans } from "next/font/google";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 
@@ -39,7 +40,7 @@ export default function RootLayout({
           )}
         >
           <Provider>
-            <Analytics />
+            <Analytics /><SpeedInsights />
             <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
             {children}
             <Toaster />

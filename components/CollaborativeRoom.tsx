@@ -118,7 +118,7 @@ const CollaborativeRoom = ({
               {loading && <p className="text-sm text-gray-400">Saving...</p>}
             </div>
             <div className="flex w-full flex-1 justify-end gap-2 sm:gap-3">
-              <ActiveCollaborators />
+              <ActiveCollaborators authorId={currentUser?.email} />
               <ShareModel
                 roomId={roomId}
                 collaborators={users}

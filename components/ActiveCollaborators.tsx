@@ -16,7 +16,7 @@ const ActiveCollaborators = ({ authorId }: { authorId: string }) => {
     return (
         <ul className="collaborators-list">
             {collaborators.map(({ id, avatar, name, color, email }) => (
-                <TooltipProvider key={id}>
+                <TooltipProvider delayDuration={100} key={id}>
                     <Tooltip>
                         <TooltipTrigger>
                             <li >

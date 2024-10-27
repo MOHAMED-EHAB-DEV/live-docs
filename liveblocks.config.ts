@@ -15,7 +15,6 @@ declare global {
     Storage: {
       // Example, a conflict-free list
       // animals: LiveList<string>;
-      document: LiveList<JsonObject>;
     };
 
     // Custom user info set when authenticating with a secret key

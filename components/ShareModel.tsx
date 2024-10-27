@@ -94,8 +94,8 @@ const ShareModel = ({
           </Button>
         </div>
 
-        <div className="my-2 space-y-2">
-          <ul className="flex flex-col">
+        {/* <div className=""> */}
+          <ul className="flex flex-col my-2 space-y-2">
             {collaborators.map((collaborator) => (
               <Collaborator
                 key={collaborator.id}
@@ -107,7 +107,7 @@ const ShareModel = ({
               />
             ))}
           </ul>
-        </div>
+        {/* </div> */}
       </DialogContent>
     </Dialog>
   );

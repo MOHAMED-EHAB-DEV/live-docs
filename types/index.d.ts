@@ -40,6 +40,7 @@ declare type IUser = {
 }
 
 declare type User = {
+  id: string;
   _id: string;
   name: string;
   email: string;

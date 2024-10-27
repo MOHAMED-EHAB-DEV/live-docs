@@ -107,63 +107,43 @@ function LexicalEditor({
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <div className="editor-container size-full">
-        <LiveblocksPlugin>
-          <div className="toolbar-wrapper flex min-w-full justify-between">
-            <ToolbarPlugin />
-            {currentUserType === "editor" && (
-              <DeleteModel
-                roomId={roomId}
-                users={users}
-                isDashboard={false}
-                folderId={folderId}
+        <div className="toolbar-wrapper flex min-w-full justify-between">
+          <ToolbarPlugin />
+          {currentUserType === 'editor' && <DeleteModel
+            roomId={roomId}
+            users={users}
+            isDashboard={false}
+            folderId={folderId}
+          />}
+        </div>
+
+        <div className="editor-wrapper flex flex-col items-center justify-start">
+          {status === 'not-loaded' || status === 'loading' ? <Skeleton /> : (
+            <div className="editor-inner min-h-[1100px] relative mb-5 h-fit w-full max-w-[800px] shadow-md lg:mb-10">
+              <RichTextPlugin
+                contentEditable={
+                  <ContentEditable className="editor-input h-full" />
+                }
+                placeholder={<span className="pointer-events-none absolute top-7 mt-px left-8 text-muted-foreground text-slate-500 w-full h-full">
+                  Try mentioning a user with @
+                </span>}
+                ErrorBoundary={LexicalErrorBoundary}
               />
-            )}
-          </div>
-          <div className="relative flex flex-row justify-between h-[calc(100%-60px)] w-full flex-1">
-            <div className="relative editor-wrapper h-full w-full overflow-y-auto overflow-x-hidden">
-              <FloatingComposer className="w-[350px]" />
-
-              <FloatingThreads threads={threads} className="block xl:hidden" />
-
-              {status === "not-loaded" || status === "loading" ? (
-                <Skeleton />
-              ) : (
-                <div className="editor-inner min-h-[1100px] relative mb-5 h-fit w-full max-w-[800px] shadow-md lg:mb-10">
-                  <div className="absolute left-full -ml-8">
-                    <AnchoredThreads
-                      threads={threads}
-                      className="w-[270px] hidden xl:block"
-                    />
-                  </div>
-                  <RichTextPlugin
-                    contentEditable={
-                      <div ref={onRef}>
-                        <ContentEditable className="editor-input relative outline-none w-full h-full px-8 py-4" />
-                      </div>
-                    }
-                    placeholder={
-                      <span className="pointer-events-none absolute top-7 mt-px left-8 text-muted-foreground text-slate-500 w-full h-full">
-                        Try mentioning a user with @
-                      </span>
-                    }
-                    ErrorBoundary={LexicalErrorBoundary}
-                  />
-
-                  {floatingAnchorElem ? (
-                    <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
-                  ) : null}
-
-                  <FloatingToolbar />
-                  <HistoryPlugin />
-                  <AutoFocusPlugin />
-                </div>
-              )}
+              {floatingAnchorElem ? (
+                <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
+              ) : null}
+              {currentUserType === 'editor' && <FloatingToolbar />}
+              <HistoryPlugin />
+              <AutoFocusPlugin />
             </div>
-          </div>
-          <Comments />
-          <PreserveSelectionPlugin />
-          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-        </LiveblocksPlugin>
+          )}
+
+          <LiveblocksPlugin>
+            <FloatingComposer className="w-[350px]" />
+            <FloatingThreads threads={threads} />
+            <Comments />
+          </LiveblocksPlugin>
+        </div>
       </div>
     </LexicalComposer>
   );

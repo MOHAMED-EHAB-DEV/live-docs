@@ -12,7 +12,6 @@ import ActiveCollaborators from "./ActiveCollaborators";
 import { updateDocument } from "@/lib/actions/room.action";
 import Loader from "./Loader";
 import ShareModel from "./ShareModel";
-import MarkdownDownloader from "./downloadAs";
 
 const CollaborativeRoom = ({
   roomId,
@@ -118,7 +117,6 @@ const CollaborativeRoom = ({
               {loading && <p className="text-sm text-gray-400">Saving...</p>}
             </div>
             <div className="flex w-full flex-1 justify-end gap-2 sm:gap-3">
-              {/* <MarkdownDownloader roomId={roomId} userId={currentUser?.email} /> */}
               <ActiveCollaborators authorId={currentUser?.email} />
               <ShareModel
                 roomId={roomId}

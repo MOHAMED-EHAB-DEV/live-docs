@@ -119,7 +119,7 @@ function ToolbarOptions({
   }
 
   return (
-    <div className="w-full text-foreground text-sm leading-relaxed">
+    <div className="w-full text-foreground bg-[#1E293B] text-sm leading-relaxed">
       {/* AI toolbar when enabled */}
       {/* {state === "ai" ? (
         <FloatingToolbarAi

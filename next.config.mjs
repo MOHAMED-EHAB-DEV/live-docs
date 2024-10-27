@@ -11,14 +11,6 @@ const nextConfig = {
             {protocol: "https", hostname: "utfs.io"},
         ],
     },
-    turbo: {
-        rules: {
-            '*.svg': {
-                loaders: ['@svgr/webpack'],
-                as: '*.js',
-            },
-        },
-    },
 };
 
 export default withSentryConfig(nextConfig, {

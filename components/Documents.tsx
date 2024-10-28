@@ -169,7 +169,7 @@ const Documents = ({
           />
 
           <div className="flex flex-col w-full max-w-[730px] gap-2">
-            <ul className="folder-ul">
+            <ul className="folder-ul m-0">
               {roomDocuments.folders.map((folder: any) => (
                 <FolderListItem
                   folder={folder}
@@ -183,7 +183,7 @@ const Documents = ({
                 />
               ))}
             </ul>
-            <ul className="document-ul">
+            <ul className="document-ul m-0">
               {roomDocuments.documents.map(
                 ({ id, metadata, createdAt, usersAccesses }: any) => (
                   <DocumentListItem

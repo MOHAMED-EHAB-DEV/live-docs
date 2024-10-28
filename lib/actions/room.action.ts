@@ -119,6 +119,7 @@ export const getDocuments = async (email: string) => {
     });
   } catch (error) {
     console.log(`Error happened while getting rooms: ${error}`);
+    throw new Error("Failed to fetch documents/folders");
   }
 };
 

@@ -71,8 +71,8 @@ const Sidebar: React.FC<SidebarProps> = ({ Open, setOpen }) => {
       }}
     >
       <div className="flex flex-col gap-[0.125rem]">
-        <h3 className="text-white text-3xl font-semibold">Account</h3>
-        <p className="text-[#ffffffa6] font-normal text-base hidden sm:block">
+        <h3 className="text-white text-3xl font-semibold m-0">Account</h3>
+        <p className="text-[#ffffffa6] font-normal text-base m-0 hidden sm:block">
           Manage your account info.
         </p>
       </div>

@@ -11,11 +11,11 @@ import { capitalizeFirstLetter } from "@/lib/utils";
 const Profile = ({ user }: { user: IUser }) => {
   const [editing, setEditing] = useState(false);
   return (
-    <div className="w-full h-full px-6 py-7 flex flex-col">
-      <h1 className="text-white font-bold text-2xl">Profile Details</h1>
+    <div className="w-full h-full px-6 py-7 flex flex-col items-start">
+      <h1 className="text-white font-bold text-2xl m-0">Profile Details</h1>
       <DropdownMenuSeparator className="h-[1px] w-full bg-[#2F2F33] my-4" />
-      <div className="flex flex-col items-center text-left gap-1 w-full">
-        <h4 className="text-base font-medium w-full">Profile</h4>
+      <div className="flex flex-col items-center text-left gap-1 w-full h-fit">
+        <h4 className="text-base font-medium w-full m-0">Profile</h4>
         {editing ? (
           <div className="flex flex-col gap-3 justify-start items-center py-4 px-5 pl-7 rounded-lg border-solid border-[#ffffff12] border-[1px] w-full h-fit">
             <div className="flex items-center justify-between gap-3 w-full">
@@ -58,7 +58,7 @@ const Profile = ({ user }: { user: IUser }) => {
       </div>
       <DropdownMenuSeparator className="h-[1px] w-full bg-[#2F2F33] my-4" />
       <div className="flex flex-col sm:flex-row items-center gap-6">
-        <h3 className="text-white font-bold text-base">Connected accounts</h3>
+        <h3 className="text-white font-bold text-base m-0">Connected accounts</h3>
         <div className="flex items-center justify-center gap-2">
           <Image
             src={`/assets/icons/${user?.provider}-logo.svg`}

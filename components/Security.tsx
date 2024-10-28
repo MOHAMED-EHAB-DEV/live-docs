@@ -50,7 +50,7 @@ const Security = ({ user }: { user: IUser }) => {
   return (
     <>
       <div className="w-full h-full px-6 py-7 flex flex-col">
-        <h1 className="text-white font-bold text-2xl">Security</h1>
+        <h1 className="text-white font-bold text-2xl m-0">Security</h1>
         <DropdownMenuSeparator className="h-[1px] w-full bg-[#2F2F33] my-4" />
         <div className="flex gap-9 items-center">
           <p className="text-white text-base font-bold">Delete Account</p>

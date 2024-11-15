@@ -99,26 +99,6 @@ const Toolbar = ({
       console.log(error);
     }
   };
-  //   return folders.map((folder) => {
-  //     if (folder.folderId === parentId) {
-  //       // If the current folder is the parent folder, add the new subfolder
-  //       return {
-  //         ...folder,
-  //         subfolders: [...(folder.subfolders || []), newFolder], // Append the new subfolder
-  //       };
-  //     }
-
-  //     // Recursively check subfolders if they exist
-  //     if (folder.subfolders && folder.subfolders.length > 0) {
-  //       return {
-  //         ...folder,
-  //         subfolders: addSubfolder(folder.subfolders, parentId, newFolder), // Recursion happens here
-  //       };
-  //     }
-
-  //     return folder;
-  //   });
-  // };
 
   const addFolderHandler = async () => {
     try {

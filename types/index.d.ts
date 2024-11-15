@@ -19,7 +19,7 @@ declare type RoomMetadata = {
 declare type CreateDocumentParams = {
   userId: string;
   email: string;
-  selectedFolder: {
+  selectedFolder?: {
     folderId: string;
     authorId: string;
     folderName: string;

@@ -61,7 +61,7 @@ The project is built with the following technologies:
 
 <h1>Contributing</h1>
 
-Contributions are welcome! Feel free to open issues or submit pull requests to improve the app. Make sure to follow the contribution guidelines.
+Contributions are welcome! Feel free to open issues or submit pull requests to improve the app. Make sure to follow the [contribution guidelines](https://github.com/MOHAMED-EHAB-DEV/live-docs/blob/main/CONTRIBUTING.md).
 
 <h1>License</h1>
 

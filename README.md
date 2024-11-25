@@ -19,7 +19,7 @@ Live Docs is a collaborative document editing platform designed to streamline yo
 The project is built with the following technologies:
 
 1. **[Next.js](https://nextjs.org/):** A powerful React framework for server-side rendering and static site generation.
-2. **[Shadcn & Tailwind CSS](https://shadcn.dev/):** A combination of UI components and utility-first styling for a clean and responsive design.
+2. **[Shadcn & Tailwind CSS](https://ui.shadcn.com/):** A combination of UI components and utility-first styling for a clean and responsive design.
 3. **[TypeScript](https://www.typescriptlang.org/):** For strong type safety and enhanced developer experience.
 4. **[MongoDB](https://www.mongodb.com/):** A NoSQL database to store user data, folders, and documents efficiently.
 

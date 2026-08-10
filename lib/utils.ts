@@ -6,6 +6,26 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+type VariantConfig = {
+  variants?: Record<string, Record<string, string>>;
+  defaultVariants?: Record<string, string>;
+};
+
+export function cva(base: string, config?: VariantConfig) {
+  return function (props?: Record<string, any>) {
+    const classes = [base];
+    if (config?.variants) {
+      for (const key in config.variants) {
+        const variantValue = props?.[key] !== undefined ? props[key] : config.defaultVariants?.[key];
+        if (variantValue && config.variants[key][variantValue]) {
+          classes.push(config.variants[key][variantValue]);
+        }
+      }
+    }
+    return cn(...classes);
+  };
+}
+
 export const parseStringify = (value: any) => JSON.parse(JSON.stringify(value));
 
 export const getAccessType = (userType: UserType) => {

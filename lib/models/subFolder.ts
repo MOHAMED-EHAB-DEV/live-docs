@@ -1,12 +1,12 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ISubFolder extends Document {
-  name: String;
+  name: string;
   updatedAt: Date;
-  documents: Array<Object>;
-  authorId: String;
-  subFolders: Array<ISubFolder>;
-  parentId: String,
+  documents: mongoose.Types.ObjectId[];
+  authorId: string;
+  subFolders: mongoose.Types.ObjectId[];
+  parentId: string;
 }
 
 const subFolderSchema = new Schema<ISubFolder>({
@@ -17,27 +17,28 @@ const subFolderSchema = new Schema<ISubFolder>({
   authorId: {
     type: String,
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-  documents: Array<Object>,
-  subFolders: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Folder',
-  }],
+  documents: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Documents",
+    },
+  ],
+  subFolders: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "SubFolder",
+    },
+  ],
   parentId: {
     type: String,
     required: true,
-  }
-});
-
-subFolderSchema.pre<ISubFolder>('save', function (next) {
-  this.updatedAt = new Date();
-  next();
+  },
+}, {
+  timestamps: true,
 });
 
 const SubFolder: Model<ISubFolder> =
-  mongoose.models.SubFolder || mongoose.model<ISubFolder>("SubFolder", subFolderSchema);
+  mongoose.models.SubFolder ||
+  mongoose.model<ISubFolder>("SubFolder", subFolderSchema);
 
 export default SubFolder;

@@ -1,19 +1,28 @@
 /* eslint-disable no-unused-vars */
 declare type SearchParamProps = {
-  params: { [key: string]: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ [key: string]: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 declare type AccessType = ["room:write"] | ["room:read", "room:presence:write"];
 
-declare type RoomAccesses = Record<string, AccessType>;
-
 declare type UserType = "creator" | "editor" | "viewer";
 
-declare type RoomMetadata = {
-  creatorId: string;
-  email: string;
+declare type IDocument = {
+  _id: string;
+  id?: string;
   title: string;
+  content: string;
+  authorEmail: string;
+  collaborators: {
+    user?: any;
+    email?: string;
+    userType: "editor" | "viewer";
+    addedBy?: any;
+  }[];
+  isPublic: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 declare type CreateDocumentParams = {
@@ -37,7 +46,7 @@ declare type IUser = {
   folders: Array<Object>;
   documents: Array<Object>;
   verified: Boolean;
-}
+};
 
 declare type User = {
   id: string;
@@ -50,10 +59,11 @@ declare type User = {
 };
 
 declare type ShareDocumentParams = {
-  roomId: string;
+  documentId: string;
   email: string;
   userType: UserType;
   updatedBy: User;
+  addedBy?: User;
 };
 
 declare type UserTypeSelectorParams = {
@@ -63,7 +73,8 @@ declare type UserTypeSelectorParams = {
 };
 
 declare type ShareDocumentDialogProps = {
-  roomId: string;
+  documentId: string;
+  documentTitle?: string;
   collaborators: User[];
   creatorId: string;
   currentUserType: UserType;
@@ -75,19 +86,19 @@ declare type HeaderProps = {
 };
 
 declare type CollaboratorProps = {
-  roomId: string;
-  email: string;
+  documentId: string;
+  documentTitle?: string;
   creatorId: string;
-  collaborator: User;
-  user: User;
+  collaborator: any;
+  user?: User;
+  email?: string;
+  onRemove?: (email: string) => void;
 };
 
 declare type CollaborativeRoomProps = {
-  roomId: string;
-  roomMetadata: RoomMetadata;
+  documentId: string;
+  document: IDocument;
   users: User[];
-  currentUserType: UserType;
-  currentUser: IUser;
   folderId: string;
 };
 
@@ -97,6 +108,4 @@ declare type AddDocumentBtnProps = {
   isEmpty: Boolean;
 };
 
-declare type DeleteModalProps = { roomId: string };
-
-declare type ThreadWrapperProps = { thread: ThreadData<BaseMetadata> };
+declare type DeleteModalProps = { documentId: string };

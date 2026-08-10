@@ -1,18 +1,24 @@
-import Image from 'next/image';
+import Image from "next/image";
 
-const Loader = () => {
-  return (
-    <div className="loader">
-        <Image 
-            src="/assets/icons/loader.svg"
-            alt="loader"
-            width="32"
-            height="32"
-            className='animate-spin'
-        />
-        Loading...
-    </div>
-  )
+interface LoaderProps {
+  text?: string;
+  className?: string;
+  size?: number;
 }
 
-export default Loader
+const Loader = ({ text = "Loading...", className = "", size = 28 }: LoaderProps) => {
+  return (
+    <div className={`flex items-center justify-center gap-3 text-white ${className}`}>
+      <Image
+        src="/assets/icons/loader.svg"
+        alt="loader"
+        width={size}
+        height={size}
+        className="animate-spin"
+      />
+      {text && <span className="text-sm text-zinc-300 font-medium">{text}</span>}
+    </div>
+  );
+};
+
+export default Loader;

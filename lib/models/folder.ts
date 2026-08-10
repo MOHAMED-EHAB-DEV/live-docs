@@ -1,37 +1,44 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IFolder extends Document {
-  id: string;
   name: string;
+  authorId: string;
+  parentId?: mongoose.Types.ObjectId | null;
+  documents: mongoose.Types.ObjectId[];
+  createdAt: Date;
   updatedAt: Date;
-  documents: Array<Object>;
-  authorId: String;
-  subFolders: Array<IFolder>;
 }
 
-const folderSchema = new Schema<IFolder>({
-  name: {
-    type: String,
-    required: true,
+const folderSchema = new Schema<IFolder>(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    authorId: {
+      type: String,
+      required: true,
+    },
+    parentId: {
+      type: Schema.Types.ObjectId,
+      ref: "Folder",
+      default: null,
+    },
+    documents: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Documents",
+      },
+    ],
   },
-  authorId: {
-    type: String,
+  {
+    timestamps: true,
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-  documents: Array<Object>,
-  subFolders: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Folder',
-  }],
-});
+);
 
-folderSchema.pre<IFolder>('save', function (next) {
-  this.updatedAt = new Date();
-  next();
-});
+if (process.env.NODE_ENV === "development") {
+  delete mongoose.models.Folder;
+}
 
 const Folder: Model<IFolder> =
   mongoose.models.Folder || mongoose.model<IFolder>("Folder", folderSchema);

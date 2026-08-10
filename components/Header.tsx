@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 const Header = ({ children, className } : HeaderProps) => {
   return (
     <div className={cn("header", className)}>
-      <Link href="/" className="md:flex-1">
+      <Link href="/">
         <Image
           src="/assets/icons/logo.svg"
           alt="logo with name"
@@ -19,7 +19,7 @@ const Header = ({ children, className } : HeaderProps) => {
           alt="logo without name"
           width={32}
           height={32}
-          className="mr-2 md:hidden"
+          className="me-2 md:hidden"
         />
       </Link>
 

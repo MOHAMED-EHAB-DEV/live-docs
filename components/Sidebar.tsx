@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "./ui/button";
+import { Button } from "./ui/Button";
 
 const links = [
   {
@@ -70,7 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ Open, setOpen }) => {
           "linear-gradient(rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03)), linear-gradient(rgb(31, 31, 35), rgb(31, 31, 35))",
       }}
     >
-      <div className="flex flex-col gap-[0.125rem]">
+      <div className="flex flex-col gap-0.5">
         <h3 className="text-white text-3xl font-semibold m-0">Account</h3>
         <p className="text-[#ffffffa6] font-normal text-base m-0 hidden sm:block">
           Manage your account info.
@@ -80,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ Open, setOpen }) => {
         {links.map(({ name, text, Icon, id, onClick }) => (
           <Button
             onClick={() => onClick(name, setOpen)}
-            className={`flex gap-3 py-[0.375rem] px-3 sm:w-44 w-36 text-[#ffffff9e] bg-transparent text-base font-medium items-center justify-center sm:justify-start outline-none border-none rounded-[0.375rem] hover:bg-[#ffffff05] ${
+            className={`flex gap-3 py-1.5 px-3 sm:w-44 w-36 text-[#ffffff9e] bg-transparent text-base font-medium items-center justify-center sm:justify-start outline-none border-none rounded-md hover:bg-[#ffffff05] ${
               Open === name &&
               "text-[#3374ff] bg-[#ffffff12] hover:bg-[#ffffff12]"
             }`}

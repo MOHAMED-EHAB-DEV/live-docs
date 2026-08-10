@@ -1,35 +1,48 @@
 "use client";
 
-import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
+import { useState, useEffect, useRef, useCallback, Dispatch, SetStateAction } from "react";
 import Link from "next/link";
 import Image from "next/image";
-
 import { cn, dateConverter } from "@/lib/utils";
-import DeleteModel from "@/components/DeleteModel";
 import Toolbar from "@/components/Toolbar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Input } from "./ui/Input";
+import EmptyState from "./EmptyState";
+import DocumentActions from "./DocumentActions";
+import FolderActions from "./FolderActions";
 import DeleteFolderModel from "./DeleteFolderModel";
-import { Input } from "./ui/input";
-import { updateFolder } from "@/lib/actions/folders.action";
+import { useUser } from "@/context/UserContext";
+import { useSocket } from "./editor/SocketProvider";
 
 const Documents = ({
   rDocuments,
-  user,
 }: {
   rDocuments: { documents: any[]; folders: any[] };
-  user: IUser;
 }) => {
+  const { user } = useUser();
+  const { socket } = useSocket();
+
+  const [sourceData, setSourceData] = useState<{
+    documents: any[];
+    folders: any[];
+  }>({
+    documents: rDocuments.documents || [],
+    folders: rDocuments.folders || [],
+  });
+
   const [roomDocuments, setRoomDocuments] = useState<{
     documents: any[];
     folders: any[];
-  }>({ documents: rDocuments.documents, folders: rDocuments.folders });
+  }>({
+    documents: rDocuments.documents || [],
+    folders: rDocuments.folders || [],
+  });
 
   const [sortType, setSortType] = useState("date-newest");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [author, setAuthor] = useState(false);
   const [search, setSearch] = useState("");
   const [expandedFolders, setExpandedFolders] = useState<{
@@ -48,28 +61,65 @@ const Documents = ({
   });
 
   useEffect(() => {
-    let updatedDocuments = rDocuments.documents || [];
-    let updatedFolders = rDocuments.folders || [];
+    setSourceData({
+      documents: rDocuments.documents || [],
+      folders: rDocuments.folders || [],
+    });
+  }, [rDocuments]);
+
+  const refetchDocuments = useCallback(async () => {
+    if (!user?.email || !user?._id) return;
+    try {
+      const res = await fetch(
+        `/api/documents?email=${encodeURIComponent(user.email)}&userId=${user._id}`
+      );
+      const data = await res.json();
+      if (data.success && data.documents) {
+        setSourceData((prev) => ({
+          ...prev,
+          documents: data.documents,
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to refetch documents:", err);
+    }
+  }, [user?.email, user?._id]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleNewNotification = () => {
+      refetchDocuments();
+    };
+    (socket as any).on("new_notification", handleNewNotification);
+    return () => {
+      (socket as any).off("new_notification", handleNewNotification);
+    };
+  }, [socket, refetchDocuments]);
+
+  useEffect(() => {
+    let updatedDocuments = [...(sourceData.documents || [])];
+    let updatedFolders = [...(sourceData.folders || [])];
 
     if (author) {
       updatedDocuments = updatedDocuments.filter(
-        (doc) => doc.metadata.email === user.email
+        (doc) => doc.authorEmail === user?.email
       );
     }
 
     if (search) {
+      const query = search.toLowerCase();
       updatedDocuments = updatedDocuments.filter((doc) =>
-        doc.metadata.title.toLowerCase().includes(search.toLowerCase())
+        doc.title.toLowerCase().includes(query)
       );
       updatedFolders = updatedFolders.filter((folder) =>
-        folder.name.toLowerCase().includes(search.toLowerCase())
+        folder.name.toLowerCase().includes(query)
       );
     }
 
     switch (sortType) {
       case "alphabetical-asc":
         updatedDocuments = updatedDocuments.sort((a, b) =>
-          a.metadata.title.localeCompare(b.metadata.title)
+          a.title.localeCompare(b.title)
         );
         updatedFolders = updatedFolders.sort((a, b) =>
           a.name.localeCompare(b.name)
@@ -77,7 +127,7 @@ const Documents = ({
         break;
       case "alphabetical-desc":
         updatedDocuments = updatedDocuments.sort((a, b) =>
-          b.metadata.title.localeCompare(a.metadata.title)
+          b.title.localeCompare(a.title)
         );
         updatedFolders = updatedFolders.sort((a, b) =>
           b.name.localeCompare(a.name)
@@ -86,21 +136,25 @@ const Documents = ({
       case "date-newest":
         updatedDocuments = updatedDocuments.sort(
           (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            new Date(b.updatedAt || b.createdAt).getTime() -
+            new Date(a.updatedAt || a.createdAt).getTime()
         );
         updatedFolders = updatedFolders.sort(
           (a, b) =>
-            new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+            new Date(b.updatedAt || b.createdAt).getTime() -
+            new Date(a.updatedAt || a.createdAt).getTime()
         );
         break;
       case "date-oldest":
         updatedDocuments = updatedDocuments.sort(
           (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            new Date(a.updatedAt || a.createdAt).getTime() -
+            new Date(b.updatedAt || b.createdAt).getTime()
         );
         updatedFolders = updatedFolders.sort(
           (a, b) =>
-            new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+            new Date(a.updatedAt || a.createdAt).getTime() -
+            new Date(b.updatedAt || b.createdAt).getTime()
         );
         break;
       default:
@@ -108,7 +162,7 @@ const Documents = ({
     }
 
     setRoomDocuments({ documents: updatedDocuments, folders: updatedFolders });
-  }, [sortType, author, search, user._id]);
+  }, [sortType, author, search, user?.email, sourceData]);
 
   const handleFolderClick = (folder: any) => {
     setSelectedFolder((prevSelected) =>
@@ -144,90 +198,97 @@ const Documents = ({
     }));
   };
 
-  return (
-    <>
-      {roomDocuments.documents.length > 0 ||
-      roomDocuments.folders.length > 0 ? (
-        <div className="document-list-container">
-          <div className="document-list-title">
-            <h3 className="text-28-semibold">All Documents and Folders</h3>
-          </div>
-          <Toolbar
-            isDocuments={true}
-            sortType={sortType}
-            setSortType={setSortType}
-            isDropdownOpen={isDropdownOpen}
-            setIsDropdownOpen={setIsDropdownOpen}
-            author={author}
-            setAuthor={setAuthor}
-            search={search}
-            setSearch={setSearch}
-            userId={user._id as string}
-            email={user.email}
-            selectedFolder={selectedFolder}
-            setData={setRoomDocuments}
-          />
+  if (!user) return null;
 
-          <div className="flex flex-col w-full max-w-[730px] gap-2">
-            <ul className="folder-ul m-0">
-              {roomDocuments.folders.map((folder: any) => (
-                <FolderListItem
-                  folder={folder}
-                  key={folder.id}
-                  expandedFolders={expandedFolders}
-                  handleFolderClick={handleFolderClick}
-                  handleSubFolderClick={handleSubfolderClick}
-                  selectedFolder={selectedFolder}
-                  isSubFolder={false}
-                  setFolders={setRoomDocuments}
-                />
-              ))}
-            </ul>
-            <ul className="document-ul m-0">
-              {roomDocuments.documents.map(
-                ({ id, metadata, createdAt, usersAccesses }: any) => (
-                  <DocumentListItem
-                    id={id}
-                    metadata={metadata}
-                    createdAt={createdAt}
-                    usersAccesses={usersAccesses}
-                    key={id}
-                    setDocuments={setRoomDocuments}
+  const hasItems =
+    roomDocuments.documents.length > 0 || roomDocuments.folders.length > 0;
+
+  return (
+    <div className="document-list-container w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col items-center">
+      {/* Title Header */}
+      <div className="w-full max-w-182.5 flex items-center justify-between mb-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+          Documents & Folders
+        </h2>
+        <span className="text-xs text-zinc-400 font-medium">
+          {roomDocuments.documents.length} document
+          {roomDocuments.documents.length !== 1 ? "s" : ""}
+          {roomDocuments.folders.length > 0 &&
+            `, ${roomDocuments.folders.length} folder${
+              roomDocuments.folders.length !== 1 ? "s" : ""
+            }`}
+        </span>
+      </div>
+
+      {/* Toolbar */}
+      <Toolbar
+        isDocuments={hasItems}
+        sortType={sortType}
+        setSortType={setSortType}
+        author={author}
+        setAuthor={setAuthor}
+        search={search}
+        setSearch={setSearch}
+        userId={user?._id as unknown as string}
+        email={user?.email}
+        selectedFolder={selectedFolder}
+        onClearFolder={() =>
+          setSelectedFolder({
+            folderId: "",
+            authorId: "",
+            folderName: "",
+            parentId: "",
+          })
+        }
+        setData={setSourceData}
+      />
+
+      {/* Document and Folder list */}
+      {hasItems ? (
+        <div className="flex flex-col w-full max-w-182.5 gap-2.5">
+          {/* Folders */}
+          {roomDocuments.folders.length > 0 && (
+            <ul className="folder-ul m-0 flex flex-col gap-1.5">
+              {roomDocuments.folders.map((folder: any) => {
+                const folderKey = folder.id || folder._id?.toString() || folder.name;
+                return (
+                  <FolderListItem
+                    folder={folder}
+                    key={folderKey}
+                    expandedFolders={expandedFolders}
+                    handleFolderClick={handleFolderClick}
+                    handleSubFolderClick={handleSubfolderClick}
+                    selectedFolder={selectedFolder}
+                    isSubFolder={false}
+                    setFolders={setSourceData}
                   />
-                )
-              )}
+                );
+              })}
             </ul>
-          </div>
+          )}
+
+          {/* Documents */}
+          <ul className="document-ul m-0 flex flex-col gap-2">
+            {roomDocuments.documents.map(
+              ({ _id, id, title, createdAt, updatedAt, collaborators, authorEmail }: any) => (
+                <DocumentListItem
+                  id={_id || id}
+                  title={title}
+                  createdAt={createdAt}
+                  updatedAt={updatedAt}
+                  collaborators={collaborators}
+                  authorEmail={authorEmail}
+                  key={_id || id}
+                  setDocuments={setSourceData}
+                />
+              )
+            )}
+          </ul>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full max-w-[730px]">
-          <div className="document-list-title mb-2">
-            <h3 className="text-28-semibold">All Documents and Folders</h3>
-          </div>
-          <Toolbar
-            isDocuments={false}
-            sortType={sortType}
-            setSortType={setSortType}
-            isDropdownOpen={isDropdownOpen}
-            setIsDropdownOpen={setIsDropdownOpen}
-            author={author}
-            setAuthor={setAuthor}
-            search={search}
-            setSearch={setSearch}
-            userId={user._id as string}
-            email={user.email}
-            selectedFolder={selectedFolder}
-            setData={setRoomDocuments}
-          />
-          <div className="document-list-empty">
-            <h4 className="sm:text-base text-base font-normal text-[#ffffffa6] w-full text-center">
-              Looks like it&apos;s empty here! Tap the &apos;+&apos; icon to
-              create a folder or document.
-            </h4>
-          </div>
-        </div>
+        <EmptyState />
       )}
-    </>
+    </div>
   );
 };
 
@@ -267,29 +328,30 @@ const FolderListItem = ({
   const [folderName, setFolderName] = useState(folder?.name);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const updateTitleHandler = async (
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (e.key === "Enter") {
       setLoading(true);
-
       try {
         if (folderName !== folder?.name) {
-          const updatedFolder = await updateFolder({
-            folderId: folder?.id,
-            folderName,
+          const res = await fetch(`/api/folders/${folder?.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: folderName }),
           });
-          if (updatedFolder) {
+
+          if (res.ok) {
             setEditing(false);
           }
         }
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     }
   };
 
@@ -300,24 +362,28 @@ const FolderListItem = ({
         !containerRef.current.contains(e.target as Node)
       ) {
         setEditing(false);
-        updateFolder({
-          folderId: folder?.id,
-          folderName,
-        });
+        if (folderName !== folder?.name) {
+          fetch(`/api/folders/${folder?.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: folderName }),
+          });
+        }
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [folderName]);
+  }, [folderName, folder?.id, folder?.name]);
+
+  const currentFolderId = folder?.id || folder?._id?.toString();
 
   return (
-    <li>
+    <li className="w-full">
       <Collapsible
-        open={expandedFolders[folder.id]}
+        open={expandedFolders[currentFolderId]}
         onOpenChange={() =>
           isSubFolder
             ? handleFolderClick(folder, parentFolder)
@@ -327,81 +393,88 @@ const FolderListItem = ({
         <CollapsibleTrigger asChild>
           <div
             className={cn(
-              "flex items-center justify-between gap-2 sm:gap-4 folder-list-item",
-              `${
-                folder.id === selectedFolder?.folderId
-                  ? "bg-slate-200 bg-opacity-30"
-                  : ""
-              }`
+              "flex items-center justify-between gap-3 p-3.5 rounded-xl bg-dark-200/80 hover:bg-dark-300/80 border border-white/5 transition cursor-pointer group shadow-sm",
+              currentFolderId === selectedFolder?.folderId &&
+                "border-blue-500/40 bg-blue-500/10"
             )}
           >
-            <div className="flex items-center justify-center gap-3">
-              <Image
-                src={
-                  expandedFolders[folder.id]
-                    ? "/assets/icons/up-arrow.svg"
-                    : "/assets/icons/down-arrow.svg"
-                }
-                alt={
-                  expandedFolders[folder.id]
-                    ? "Dropdown Open"
-                    : "Dropdown Closed"
-                }
-                width={12}
-                height={12}
-              />
-              <div className="hidden rounded-md bg-dark-500 p-1 sm:block">
+            <div className="flex items-center gap-3 min-w-0">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${
+                  expandedFolders[currentFolderId] ? "rotate-90" : ""
+                }`}
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+
+              <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">
                 <Image
                   src="/assets/icons/folder.svg"
                   alt="folder"
-                  width={14}
-                  height={14}
+                  width={16}
+                  height={16}
                 />
               </div>
+
               <div
                 ref={containerRef}
-                className="flex w-fit items-center justify-center gap-2"
+                onClick={(e) => editing && e.stopPropagation()}
+                className="flex items-center gap-2 min-w-0"
               >
                 {editing && !loading ? (
                   <Input
                     type="text"
                     value={folderName}
                     ref={inputRef}
-                    placeholder="Enter title"
+                    autoFocus
+                    placeholder="Enter folder title"
                     onChange={(e) => setFolderName(e.target.value)}
                     onKeyDown={updateTitleHandler}
-                    disabled={!editing}
-                    className="folder-name-input"
+                    className="h-7 text-sm bg-dark-350 border border-white/10 px-2 rounded-md"
                   />
                 ) : (
-                  <>
-                    <p className="line-clamp-1 text-sm sm:text-base">
-                      {folderName}
-                    </p>
-                  </>
+                  <p className="truncate text-sm font-medium text-white">
+                    {folderName}
+                  </p>
                 )}
 
                 {!editing && (
-                  <Image
-                    src="/assets/icons/edit.svg"
-                    alt="edit"
-                    width={12}
-                    height={12}
-                    onClick={() => setEditing(true)}
-                    className="cursor-pointer"
-                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditing(true);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-white transition p-1"
+                  >
+                    <Image
+                      src="/assets/icons/edit.svg"
+                      alt="edit"
+                      width={12}
+                      height={12}
+                    />
+                  </button>
                 )}
-
-                {loading && <p className="text-sm text-gray-400">Saving...</p>}
               </div>
             </div>
-            <div className="flex items-center justify-end gap-1 sm:gap-3">
-              <p className="text-xs sm:text-sm w-20 sm:w-fit font-light text-blue-100">
-                Last Updated {dateConverter(folder.updatedAt)}
+
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Normal/Desktop: Show Updated At, Mobile: Hidden */}
+              <p className="hidden sm:block text-xs text-zinc-400">
+                Updated {dateConverter(folder.updatedAt || folder.createdAt)}
               </p>
-              <DeleteFolderModel
+              <FolderActions
                 folderId={folder?.id}
-                email={folder?.authorId}
+                folderName={folder?.name || folderName}
+                authorEmail={folder?.authorId}
+                onStartRename={() => setEditing(true)}
                 setFolders={setFolders}
               />
             </div>
@@ -409,40 +482,42 @@ const FolderListItem = ({
         </CollapsibleTrigger>
 
         <CollapsibleContent>
-          <ul className="subfolder-document-ul">
+          <ul className="subfolder-document-ul ps-6 flex flex-col gap-1.5 mt-1.5">
             {folder?.documents?.length || folder?.subFolders?.length ? (
               <>
-                {folder.subFolders?.map((subfolder: any) => (
-                  <FolderListItem
-                    key={subfolder.id}
-                    folder={subfolder}
-                    handleFolderClick={handleSubFolderClick}
-                    expandedFolders={expandedFolders}
-                    handleSubFolderClick={handleSubFolderClick}
-                    selectedFolder={selectedFolder}
-                    isSubFolder={true}
-                    parentFolder={folder}
-                    setFolders={setFolders}
-                  />
-                ))}
+                {folder.subFolders?.map((subfolder: any) => {
+                  const subKey = subfolder.id || subfolder._id?.toString() || subfolder.name;
+                  return (
+                    <FolderListItem
+                      key={subKey}
+                      folder={subfolder}
+                      handleFolderClick={handleSubFolderClick}
+                      expandedFolders={expandedFolders}
+                      handleSubFolderClick={handleSubFolderClick}
+                      selectedFolder={selectedFolder}
+                      isSubFolder={true}
+                      parentFolder={folder}
+                      setFolders={setFolders}
+                    />
+                  );
+                })}
 
                 {folder.documents?.map((doc: any) => (
                   <DocumentListItem
-                    key={doc.id}
-                    id={doc.id}
-                    metadata={doc.metadata}
+                    key={doc._id || doc.id}
+                    id={doc._id || doc.id}
+                    title={doc.title}
                     createdAt={doc.createdAt}
-                    usersAccesses={doc.usersAccesses}
+                    updatedAt={doc.updatedAt}
+                    collaborators={doc.collaborators}
+                    authorEmail={doc.authorEmail}
                     folderId={folder.id}
                     setDocuments={setFolders}
                   />
                 ))}
               </>
             ) : (
-              <h4 className="sm:text-base text-base font-normal text-[#ffffffa6] w-full text-center">
-                Looks like it&apos;s empty here! Tap the &apos;+&apos; icon to
-                create a folder or document.
-              </h4>
+              <EmptyState />
             )}
           </ul>
         </CollapsibleContent>
@@ -453,40 +528,47 @@ const FolderListItem = ({
 
 const DocumentListItem = ({
   id,
-  metadata,
+  title,
   createdAt,
-  usersAccesses,
+  updatedAt,
+  collaborators,
+  authorEmail,
   folderId,
-  setDocuments
+  setDocuments,
 }: any) => {
   return (
-    <li className="document-list-item">
+    <li className="w-full flex items-center justify-between gap-3 p-3.5 rounded-xl bg-dark-200/80 hover:bg-dark-300/80 border border-white/5 transition group shadow-sm">
       <Link
         href={`/documents/${id}`}
-        className="flex flex-1 items-center justify-between gap-4"
+        className="flex flex-1 items-center gap-3 min-w-0"
       >
-        <div className="flex items-center gap-3">
-          <div className="hidden rounded-md bg-dark-500 p-1 sm:block">
-            <Image
-              src="/assets/icons/doc.svg"
-              alt="file"
-              width={20}
-              height={20}
-            />
-          </div>
-          <p className="line-clamp-1 text-md">{metadata.title}</p>
+        <div className="p-1.5 rounded-lg bg-dark-350 text-blue-400 group-hover:bg-blue-500/10 transition shrink-0">
+          <Image
+            src="/assets/icons/doc.svg"
+            alt="document"
+            width={18}
+            height={18}
+          />
         </div>
-        <p className="text-sm font-light text-blue-100">
-          Created At {dateConverter(createdAt)}
+        <p className="truncate text-sm font-medium text-white group-hover:text-blue-300 transition">
+          {title || "Untitled Document"}
         </p>
       </Link>
-      <DeleteModel
-        roomId={id}
-        users={Object.keys(usersAccesses)}
-        folderId={folderId}
-        setDocuments={setDocuments}
-        isDashboard={true}
-      />
+
+      <div className="flex items-center gap-3 shrink-0">
+        {/* Mobile: Removed/Hidden date | Normal Desktop: Show Updated At */}
+        <p className="hidden sm:block text-xs text-zinc-400 font-normal">
+          Updated {dateConverter(updatedAt || createdAt)}
+        </p>
+
+        {/* More Actions Dropdown (Share, Open, Delete) */}
+        <DocumentActions
+          documentId={id}
+          documentTitle={title || "Untitled Document"}
+          folderId={folderId}
+          setDocuments={setDocuments}
+        />
+      </div>
     </li>
   );
 };

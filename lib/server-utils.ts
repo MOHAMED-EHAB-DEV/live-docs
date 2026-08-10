@@ -1,37 +1,35 @@
 "use server";
 
-import { IFolder } from "./models/folder";
 import SubFolder from "./models/subFolder";
-import { getDocument } from "./actions/room.action";
+import Documents from "./models/document";
 
-export const processFolder = async (folder: any): Promise<IFolder> => {
+export const processFolder = async (folder: any): Promise<any> => {
+  if (!folder) return null;
   const processedFolder = {
     id: folder?._id?.toString(),
     name: folder?.name,
     updatedAt: folder?.updatedAt,
     authorId: folder.authorId,
-    documents: [],
-    subFolders: [],
+    documents: [] as any[],
+    subFolders: [] as any[],
   };
 
   if (folder?.documents?.length > 0) {
     for (let i = 0; i < folder?.documents?.length; i++) {
-      const doc = folder?.documents[i];
-
-      const processedDoc = await getDocument({
-        roomId: doc?.id,
-        userId: folder.authorId,
-      });
-
-      processedFolder.documents.push(processedDoc);
+      const docId = folder?.documents[i];
+      const processedDoc = await Documents.findById(docId).lean();
+      if (processedDoc) {
+        processedFolder.documents.push({
+          ...processedDoc,
+          id: (processedDoc as any)._id.toString(),
+        });
+      }
     }
   }
 
   if (folder?.subFolders?.length > 0) {
     for (let i = 0; i < folder?.subFolders?.length; i++) {
-      const subFolder = await SubFolder.findOne({
-        _id: folder.subFolders[i],
-      });
+      const subFolder = await SubFolder.findById(folder.subFolders[i]).lean();
       if (subFolder) {
         const processedSubFolder = await processFolder(subFolder);
         processedFolder.subFolders.push(processedSubFolder);

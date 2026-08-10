@@ -1,76 +1,61 @@
-import { useState } from "react";
+"use client";
+
 import Image from "next/image";
-import { X } from "lucide-react";
-
-import { DropdownMenuSeparator } from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
-
 import UpdateProfile from "./UpdateProfile";
 import { capitalizeFirstLetter } from "@/lib/utils";
+import { IUser } from "@/lib/models/user";
 
 const Profile = ({ user }: { user: IUser }) => {
-  const [editing, setEditing] = useState(false);
+  const provider = user?.provider || "google";
+
   return (
-    <div className="w-full h-full px-6 py-7 flex flex-col items-start">
-      <h1 className="text-white font-bold text-2xl m-0">Profile Details</h1>
-      <DropdownMenuSeparator className="h-[1px] w-full bg-[#2F2F33] my-4" />
-      <div className="flex flex-col items-center text-left gap-1 w-full h-fit">
-        <h4 className="text-base font-medium w-full m-0">Profile</h4>
-        {editing ? (
-          <div className="flex flex-col gap-3 justify-start items-center py-4 px-5 pl-7 rounded-lg border-solid border-[#ffffff12] border-[1px] w-full h-fit">
-            <div className="flex items-center justify-between gap-3 w-full">
-              <h3 className="text-white font-bold text-base w-full sm:text-left text-center">
-                Update Profile
-              </h3>
-              <X
-                className="h-4 w-4 cursor-pointer"
-                onClick={() => setEditing(false)}
+    <div className="w-full flex flex-col gap-8">
+      {/* Section Header */}
+      <div className="flex flex-col text-start gap-1 pb-4 border-b border-white/10">
+        <h2 className="text-xl font-bold text-white tracking-tight">
+          Profile Details
+        </h2>
+        <p className="text-sm text-zinc-400">
+          Manage your personal information, avatar, and public profile details.
+        </p>
+      </div>
+
+      {/* Edit Profile Form */}
+      <UpdateProfile user={user} />
+
+      {/* Connected Accounts Section */}
+      <div className="flex flex-col text-start gap-4 pt-4 border-t border-white/10">
+        <div>
+          <h3 className="text-base font-semibold text-white">Connected Accounts</h3>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Accounts and identity providers linked to your LiveDocs profile.
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between p-4 rounded-xl bg-dark-350/50 border border-white/5">
+          <div className="flex items-center gap-3.5">
+            <div className="p-2 rounded-lg bg-white/5 ring-1 ring-white/10 flex items-center justify-center">
+              <Image
+                src={`/assets/icons/${provider}-logo.svg`}
+                alt={`${provider} logo`}
+                width={20}
+                height={20}
+                className="w-5 h-5"
               />
             </div>
-            <UpdateProfile user={user} setEditing={setEditing} />
-          </div>
-        ) : (
-          <div className="flex items-center w-full pr-2 gap-5 justify-between">
-            <div className="flex items-center justify-center gap-3 px-3 py-2">
-              <Image
-                src={
-                  user.image
-                    ? (user.image as string)
-                    : "/assets/icons/userProfile.png"
-                }
-                alt={user.name}
-                width={24}
-                height={24}
-                className="object-cover rounded-full"
-              />
-              <span className="font-medium text-sm sm:text-base text-white truncate">
-                {user.name as string}
+            <div className="flex flex-col text-start">
+              <span className="text-sm font-medium text-white">
+                {capitalizeFirstLetter(provider)}
+              </span>
+              <span className="text-xs text-zinc-400">
+                {user?.email}
               </span>
             </div>
-            <Button
-              onClick={() => setEditing(true)}
-              className="text-[#3374ff] bg-transparent hover:bg-[#ffffff12] rounded-[0.375rem] text-base font-medium py-3 w-fit"
-            >
-              Update Profile
-            </Button>
           </div>
-        )}
-      </div>
-      <DropdownMenuSeparator className="h-[1px] w-full bg-[#2F2F33] my-4" />
-      <div className="flex flex-col sm:flex-row items-center gap-6">
-        <h3 className="text-white font-bold text-base m-0">Connected accounts</h3>
-        <div className="flex items-center justify-center gap-2">
-          <Image
-            src={`/assets/icons/${user?.provider}-logo.svg`}
-            alt="Google Icon"
-            width={16}
-            height={16}
-          />
-          <p className="text-white text-base font-normal">
-            {capitalizeFirstLetter(user?.provider as string)}
-          </p>
-          <span className="text-base text-[#ffffffa6] font-normal truncate">
-            • {user?.email}
+
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Connected
           </span>
         </div>
       </div>

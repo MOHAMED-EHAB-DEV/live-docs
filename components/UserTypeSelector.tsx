@@ -6,30 +6,35 @@ import {
   SelectItem,
 } from "./ui/select";
 
+const typeLabels: Record<string, string> = {
+  viewer: "can view",
+  editor: "can edit",
+};
+
 const UserTypeSelector = ({
-  userType,
+  userType = "viewer",
   setUserType,
   onClickHandler,
 }: UserTypeSelectorParams) => {
+  const selectedType = userType || "viewer";
+
   const accessChangeHandler = (type: UserType) => {
     setUserType(type);
     onClickHandler && onClickHandler(type);
   };
+
   return (
     <Select
-      value={userType}
-      onValueChange={(type: UserType) => accessChangeHandler(type)}
+      value={selectedType}
+      defaultValue={selectedType}
+      onValueChange={(type: string) => accessChangeHandler(type as UserType)}
     >
-      <SelectTrigger className="shad-select">
-        <SelectValue />
+      <SelectTrigger className="border-0 bg-transparent text-blue-100 shadow-none hover:bg-dark-300/50 focus-visible:ring-0">
+        <SelectValue placeholder={typeLabels[selectedType] || "can view"} />
       </SelectTrigger>
-      <SelectContent className="border-none bg-dark-200">
-        <SelectItem value="viewer" className="shad-select-item">
-          can view
-        </SelectItem>
-        <SelectItem value="editor" className="shad-select-item">
-          can edit
-        </SelectItem>
+      <SelectContent position="bottom-right">
+        <SelectItem value="viewer">can view</SelectItem>
+        <SelectItem value="editor">can edit</SelectItem>
       </SelectContent>
     </Select>
   );

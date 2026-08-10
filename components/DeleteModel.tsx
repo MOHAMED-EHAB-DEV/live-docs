@@ -3,28 +3,33 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import Image from "next/image";
 
+import { Button } from "@/components/ui/Button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
-  DialogClose,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { deleteDocument } from "@/lib/actions/room.action";
+
+function removeDocFromTree(folders: any[], docId: string): any[] {
+  return folders.map((f) => ({
+    ...f,
+    documents: (f.documents || []).filter(
+      (d: any) => d._id !== docId && d.id !== docId
+    ),
+    subFolders: f.subFolders ? removeDocFromTree(f.subFolders, docId) : [],
+  }));
+}
 
 const DeleteModel = ({
-  roomId,
-  users,
+  documentId,
   folderId,
   setDocuments,
   isDashboard,
 }: {
-  roomId: string;
-  users: Array<String>;
+  documentId: string;
   folderId?: string;
   setDocuments: Dispatch<
     SetStateAction<{
@@ -41,15 +46,21 @@ const DeleteModel = ({
     setLoading(true);
 
     try {
-      const documents = await deleteDocument(roomId, users, folderId ? true : false, folderId, isDashboard);
-      
+      // Calling our Next.js API route to delete the document
+      const res = await fetch(`/api/documents/${documentId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Failed to delete document");
+
       if (isDashboard) {
         setDocuments((prev) => {
           return {
             ...prev,
-            documents,
-          }
-        })
+            documents: prev.documents.filter((doc) => doc._id !== documentId && doc.id !== documentId),
+            folders: removeDocFromTree(prev.folders || [], documentId),
+          };
+        });
       }
 
       setOpen(false);
@@ -63,7 +74,11 @@ const DeleteModel = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="min-w-9 rounded-xl bg-transparent p-2 transition-all">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="min-w-9 rounded-xl p-2 transition-all"
+        >
           <Image
             src="/assets/icons/delete.svg"
             alt="delete"
@@ -74,7 +89,7 @@ const DeleteModel = ({
         </Button>
       </DialogTrigger>
       <DialogContent className="shad-dialog">
-        <DialogHeader>
+        <DialogHeader className="flex flex-col gap-1 items-start">
           <Image
             src="/assets/icons/delete-modal.svg"
             alt="delete"
@@ -82,22 +97,28 @@ const DeleteModel = ({
             height={48}
             className="mb-4"
           />
-          <DialogTitle>Delete document</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete this document? This action cannot be
-            undone.
-          </DialogDescription>
+          <DialogTitle className="text-xl font-bold">Delete document</DialogTitle>
         </DialogHeader>
+        
+        <p className="text-zinc-400">
+          Are you sure you want to delete this document? This action cannot
+          be undone.
+        </p>
 
-        <DialogFooter className="mt-5">
-          <DialogClose asChild className="w-full bg-dark-400 text-white">
+        <DialogFooter className="mt-5 sm:justify-start">
+          <Button
+            variant="secondary"
+            onClick={() => setOpen(false)}
+            className="w-full sm:w-auto bg-dark-400 text-white"
+          >
             Cancel
-          </DialogClose>
+          </Button>
 
           <Button
             variant="destructive"
             onClick={deleteDocumentHandler}
-            className="gradient-red w-full"
+            className="gradient-red w-full sm:w-auto"
+            disabled={loading}
           >
             {loading ? "Deleting..." : "Delete"}
           </Button>
@@ -108,3 +129,4 @@ const DeleteModel = ({
 };
 
 export default DeleteModel;
+

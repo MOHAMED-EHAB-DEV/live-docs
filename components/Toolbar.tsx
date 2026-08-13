@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import Search from "./Search";
 import { Input } from "./ui/Input";
-import { Button } from "./ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Checkbox } from "./ui/Checkbox";
 import Loader from "./Loader";
 import { toast } from "react-toastify";

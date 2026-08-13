@@ -11,7 +11,7 @@ import DeveloperBadge from "@/components/DeveloperBadge";
 const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret_for_development";
 
 async function fetchDocuments(email: string, userId: string, token: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
   try {
     const [docsRes, foldersRes] = await Promise.all([
       fetch(`${baseUrl}/api/documents?email=${email}&userId=${userId}`, {

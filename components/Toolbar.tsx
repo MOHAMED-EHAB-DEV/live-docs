@@ -18,9 +18,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import Search from "./Search";
-import { Input } from "./ui/Input";
-import { Button } from "@/components/ui/Button";
-import { Checkbox } from "./ui/Checkbox";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import Loader from "./Loader";
 import { toast } from "react-toastify";
 

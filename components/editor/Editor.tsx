@@ -21,7 +21,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { CustomImage } from "./CustomImage";
 import { CustomCodeBlock } from "./CustomCodeBlock";
 import { TextColorPicker, HighlightPicker } from "./ColorPicker";

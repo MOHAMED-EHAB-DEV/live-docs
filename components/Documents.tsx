@@ -12,7 +12,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Input } from "./ui/Input";
+import { Input } from "@/components/ui/input";
 import EmptyState from "./EmptyState";
 import DocumentActions from "./DocumentActions";
 import FolderActions from "./FolderActions";

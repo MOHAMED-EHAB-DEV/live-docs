@@ -2,7 +2,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import UserTypeSelector from "./UserTypeSelector";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
 import { useSocket } from "./editor/SocketProvider";
 

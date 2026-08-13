@@ -17,7 +17,7 @@ const Collapsible = ({ open, onOpenChange, children, className }: any) => {
   );
 };
 
-import { Slot } from "./Slot";
+import { Slot } from "./slot";
 
 const CollapsibleTrigger = React.forwardRef<HTMLElement, any>(
   ({ className, children, asChild, open, onOpenChange, ...props }, ref) => {

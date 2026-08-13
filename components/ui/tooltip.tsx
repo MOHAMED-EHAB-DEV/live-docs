@@ -46,7 +46,7 @@ export const Tooltip = ({ children, content, position = 'top', className }: Tool
         <div
           ref={contentRef}
           className={cn(
-            "fixed z-[150] px-3 py-1.5 text-xs font-medium text-blue-100 bg-dark-400 rounded-lg shadow-xl pointer-events-none whitespace-nowrap",
+            "fixed z-150 px-3 py-1.5 text-xs font-medium text-blue-100 bg-dark-400 rounded-lg shadow-xl pointer-events-none whitespace-nowrap",
             "animate-in fade-in zoom-in-95 duration-200",
             className
           )}

@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { useFloating, Placement } from "@/hooks/useFloating";
 import { useDelayedUnmount } from "@/hooks/useDelayedUnmount";
-import { Slot } from "./Slot";
+import { Slot } from "./slot";
 
 export type PopoverPlacement = Placement;
 

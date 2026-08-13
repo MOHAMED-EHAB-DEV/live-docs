@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +21,7 @@ import {
 import { toast } from "react-toastify";
 import UserTypeSelector from "./UserTypeSelector";
 import Collaborator from "./Collaborator";
-import { Input } from "./ui/Input";
+import { Input } from "@/components/ui/input";
 import Loader from "./Loader";
 import { useUser } from "@/context/UserContext";
 

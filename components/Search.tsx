@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react";
 
-import { Input } from "./ui/Input";
+import { Input } from "@/components/ui/input";
 
 const Search = ({ search, setSearch, className } : { search: string, setSearch: Dispatch<SetStateAction<string>>, className?: string }) => {
   return (

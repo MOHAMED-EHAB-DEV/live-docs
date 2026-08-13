@@ -2,8 +2,8 @@
 
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
 import { isBase64Image } from "@/lib/utils";
 import Loader from "./Loader";

@@ -5,7 +5,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 
 import UserDropdown from "@/components/UserDropdown";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { SocketProvider, useSocket } from "@/components/editor/SocketProvider";
 import Header from "@/components/Header";
 import ActiveCollaborators from "./ActiveCollaborators";

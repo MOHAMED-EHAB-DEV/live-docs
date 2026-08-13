@@ -18,7 +18,7 @@ const Dialog = ({ open, onOpenChange, children }: any) => {
   );
 };
 
-import { Slot } from "./Slot";
+import { Slot } from "./slot";
 
 const DialogTrigger = React.forwardRef<HTMLElement, any>(
   ({ className, children, asChild, ...props }, ref) => {

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useSocket } from "./editor/SocketProvider";
-import { Tooltip } from "@/components/ui/Tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
 
 const ActiveCollaborators = ({ authorId }: { authorId: string }) => {
   const { activeUsers } = useSocket();

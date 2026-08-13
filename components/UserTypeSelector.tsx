@@ -4,7 +4,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "./ui/select";
+} from "@/components/ui/select";
 
 const typeLabels: Record<string, string> = {
   viewer: "can view",

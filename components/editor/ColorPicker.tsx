@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/Popover";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Editor } from "@tiptap/react";
 

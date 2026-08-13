@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { useFloating } from "@/hooks/useFloating";
 import { useDelayedUnmount } from "@/hooks/useDelayedUnmount";
-import { Slot } from "./Slot";
+import { Slot } from "./slot";
 
 interface SelectContextType {
   value?: string;

@@ -56,6 +56,10 @@ interface ToolbarProps {
       folders: any[];
     }>
   >;
+  isFolderDialogOpen?: boolean;
+  setIsFolderDialogOpen?: Dispatch<SetStateAction<boolean>>;
+  onAddDocument?: () => void;
+  docLoading?: boolean;
 }
 
 const Toolbar = ({
@@ -70,19 +74,31 @@ const Toolbar = ({
   selectedFolder,
   onClearFolder,
   setData,
+  isFolderDialogOpen: externalFolderDialogOpen,
+  setIsFolderDialogOpen: externalSetFolderDialogOpen,
+  onAddDocument,
+  docLoading: externalDocLoading,
 }: ToolbarProps) => {
   const router = useRouter();
 
   // Modal and Action state
-  const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
+  const [localFolderDialogOpen, setLocalFolderDialogOpen] = useState(false);
+  const isFolderDialogOpen = externalFolderDialogOpen !== undefined ? externalFolderDialogOpen : localFolderDialogOpen;
+  const setIsFolderDialogOpen = externalSetFolderDialogOpen || setLocalFolderDialogOpen;
+
   const [folderName, setFolderName] = useState("");
   const [folderLoading, setFolderLoading] = useState(false);
-  const [docLoading, setDocLoading] = useState(false);
+  const [localDocLoading, setLocalDocLoading] = useState(false);
+  const docLoading = externalDocLoading !== undefined ? externalDocLoading : localDocLoading;
   const [addMenuOpen, setAddMenuOpen] = useState(false);
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
 
   const addDocumentHandler = async () => {
-    setDocLoading(true);
+    if (onAddDocument) {
+      onAddDocument();
+      return;
+    }
+    setLocalDocLoading(true);
     try {
       const payload: any = { userId, email };
       if (selectedFolder?.folderId) {
@@ -105,7 +121,7 @@ const Toolbar = ({
       console.error("Create document error:", error);
       toast.error("Failed to create document");
     } finally {
-      setDocLoading(false);
+      setLocalDocLoading(false);
     }
   };
 

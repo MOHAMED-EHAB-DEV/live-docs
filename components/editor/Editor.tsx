@@ -73,8 +73,10 @@ export const Editor = ({ roomId, currentUserType, currentUserEmail, initialConte
 
   useEffect(() => {
     const doc = new Y.Doc();
+    const wsUrl = (`${process.env.NEXT_PUBLIC_SOCKET_SERVER_URL}/yjs` || "ws://localhost:7860/yjs")
+      .replace(/^http/, "ws");
     const wsProvider = new WebsocketProvider(
-      process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "ws://localhost:3001",
+      wsUrl,
       roomId,
       doc,
       {
@@ -178,6 +180,8 @@ const TiptapEditor = ({ provider, ydoc, documentId, currentUserType, currentUser
     extensions: [
       StarterKit.configure({
         codeBlock: false,
+        undoRedo: false,
+        underline: false,
       }),
       CustomCodeBlock,
       SmartEnterExtension,

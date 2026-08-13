@@ -94,8 +94,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       });
 
       // Notify socket server non-blocking
-      const socketServerUrl = process.env.SOCKET_SERVER_URL || process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3001";
-      fetch(`${socketServerUrl}/api/notify`, {
+      const socketServerUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:7860";
+      fetch(`${socketServerUrl}/api/live-docs/notify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

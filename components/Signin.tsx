@@ -106,7 +106,7 @@ const Signin = () => {
           </div>
 
           <Button
-            as={Link}
+            as="a"
             href="/api/auth/google"
             variant="outline"
             className="w-full h-12 font-medium flex items-center justify-center gap-2 border-dark-350 bg-dark-200 hover:bg-dark-300"

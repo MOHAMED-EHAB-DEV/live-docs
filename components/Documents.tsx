@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback, Dispatch, SetStateAction } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import { cn, dateConverter } from "@/lib/utils";
 import Toolbar from "@/components/Toolbar";
 import {
@@ -25,6 +27,10 @@ const Documents = ({
 }) => {
   const { user } = useUser();
   const { socket } = useSocket();
+  const router = useRouter();
+
+  const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
+  const [docLoading, setDocLoading] = useState(false);
 
   const [sourceData, setSourceData] = useState<{
     documents: any[];
@@ -59,6 +65,35 @@ const Documents = ({
     folderName: "",
     parentId: "",
   });
+
+  const addDocumentHandler = async () => {
+    if (!user?.email || !user?._id) return;
+    setDocLoading(true);
+    try {
+      const payload: any = { userId: user._id, email: user.email };
+      if (selectedFolder?.folderId) {
+        payload.folderId = selectedFolder.folderId;
+      }
+
+      const res = await fetch("/api/documents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (data.success && data.document) {
+        router.push(`/documents/${data.document._id}`);
+      } else {
+        toast.error(data.error || "Failed to create document");
+      }
+    } catch (error) {
+      console.error("Create document error:", error);
+      toast.error("Failed to create document");
+    } finally {
+      setDocLoading(false);
+    }
+  };
 
   useEffect(() => {
     setSourceData({
@@ -241,6 +276,10 @@ const Documents = ({
           })
         }
         setData={setSourceData}
+        isFolderDialogOpen={isFolderDialogOpen}
+        setIsFolderDialogOpen={setIsFolderDialogOpen}
+        onAddDocument={addDocumentHandler}
+        docLoading={docLoading}
       />
 
       {/* Document and Folder list */}
@@ -285,8 +324,47 @@ const Documents = ({
             )}
           </ul>
         </div>
+      ) : search ? (
+        <EmptyState
+          icon="search"
+          title="No matching documents"
+          description={`We couldn't find any documents or folders matching "${search}".`}
+          actionText="Clear Search"
+          onAction={() => setSearch("")}
+        />
+      ) : author ? (
+        <EmptyState
+          icon="doc"
+          title="No personal documents"
+          description="You haven't created any documents yet or none match your filter."
+          actionText="Create Document"
+          onAction={addDocumentHandler}
+          secondaryActionText="Show All Documents"
+          onSecondaryAction={() => setAuthor(false)}
+          isLoading={docLoading}
+        />
+      ) : selectedFolder?.folderName ? (
+        <EmptyState
+          icon="folder"
+          title={`"${selectedFolder.folderName}" is empty`}
+          description="Get started by creating a new document or subfolder inside this folder."
+          actionText="New Document"
+          onAction={addDocumentHandler}
+          secondaryActionText="New Subfolder"
+          onSecondaryAction={() => setIsFolderDialogOpen(true)}
+          isLoading={docLoading}
+        />
       ) : (
-        <EmptyState />
+        <EmptyState
+          icon="doc"
+          title="No documents or folders yet"
+          description="Create your first document to start collaborating, or organize your workspace with folders."
+          actionText="Create Document"
+          onAction={addDocumentHandler}
+          secondaryActionText="Create Folder"
+          onSecondaryAction={() => setIsFolderDialogOpen(true)}
+          isLoading={docLoading}
+        />
       )}
     </div>
   );
@@ -517,7 +595,13 @@ const FolderListItem = ({
                 ))}
               </>
             ) : (
-              <EmptyState />
+              <div className="ps-2 py-1">
+                <EmptyState
+                  icon="folder"
+                  title="Folder is empty"
+                  description="No documents or subfolders inside this folder."
+                />
+              </div>
             )}
           </ul>
         </CollapsibleContent>

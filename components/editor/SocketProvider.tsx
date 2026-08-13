@@ -70,7 +70,7 @@ export const SocketProvider = ({
     }
 
     const socketInstance = io(
-      process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3001",
+      `${process.env.NEXT_PUBLIC_SOCKET_SERVER_URL}/live-docs` || "http://localhost:7860/live-docs",
       {
         transports: ["websocket", "polling"],
         reconnection: true,

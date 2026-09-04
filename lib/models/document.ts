@@ -3,6 +3,7 @@ import mongoose, {
   Document as MongooseDocument,
   Model,
 } from "mongoose";
+import "./user";
 
 export interface ICollaborator {
   user: mongoose.Types.ObjectId | any;
@@ -36,11 +37,6 @@ const documentSchema = new Schema<IDocument>(
   },
   { timestamps: true },
 );
-
-// Delete cached model in development to pick up schema changes
-if (process.env.NODE_ENV === "development") {
-  delete mongoose.models.Documents;
-}
 
 const Documents: Model<IDocument> =
   mongoose.models.Documents ||

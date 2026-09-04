@@ -1,4 +1,10 @@
 import mongoose from 'mongoose';
+import './models/user';
+import './models/document';
+import './models/folder';
+import './models/subFolder';
+import './models/comment';
+import './models/notification';
 declare global {
   var mongoose: any;
 }

@@ -18,7 +18,7 @@ async function getAllDescendantFolderIds(parentId: string): Promise<string[]> {
 
 export async function PUT(
   request: Request,
-  props: { params: Promise<{ id: string }> }
+  props: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await props.params;
@@ -33,7 +33,7 @@ export async function PUT(
     const folder = await Folder.findByIdAndUpdate(
       id,
       { name: name.trim(), updatedAt: new Date() },
-      { new: true }
+      { new: true },
     );
 
     if (!folder) {
@@ -43,13 +43,16 @@ export async function PUT(
     return NextResponse.json({ success: true, folder }, { status: 200 });
   } catch (error) {
     console.error("Error updating folder:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
   request: Request,
-  props: { params: Promise<{ id: string }> }
+  props: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await props.params;
@@ -79,6 +82,9 @@ export async function DELETE(
     return NextResponse.json({ success: true, folders }, { status: 200 });
   } catch (error) {
     console.error("Error deleting folder:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

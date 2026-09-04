@@ -47,7 +47,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ initialTab = "profile" }) =
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] w-full">
+      <div className="flex items-center justify-center min-h-[calc(100vh-120px)] w-full">
         <Loader text="Loading account settings..." size={32} />
       </div>
     );

@@ -63,10 +63,16 @@ export async function GET(request: Request) {
 
     const folderTree = buildFolderTree(allFolders);
 
-    return NextResponse.json({ success: true, folders: folderTree }, { status: 200 });
+    return NextResponse.json(
+      { success: true, folders: folderTree },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Error fetching folders:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -77,7 +83,7 @@ export async function POST(request: Request) {
     if (!name || !email) {
       return NextResponse.json(
         { error: "Folder name and email are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -97,9 +103,15 @@ export async function POST(request: Request) {
 
     const folderTree = buildFolderTree(allFolders);
 
-    return NextResponse.json({ success: true, folders: folderTree }, { status: 200 });
+    return NextResponse.json(
+      { success: true, folders: folderTree },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Error creating folder:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

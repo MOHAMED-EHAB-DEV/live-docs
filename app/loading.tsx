@@ -1,7 +1,11 @@
 import Loader from "@/components/Loader";
 
-const loading = () => {
-    return <Loader />;
-}
+const Loading = () => {
+  return (
+    <div className="flex min-h-screen w-full items-center justify-center">
+      <Loader />
+    </div>
+  );
+};
 
-export default loading;
+export default Loading;

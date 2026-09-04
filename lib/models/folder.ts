@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import "./document";
 
 export interface IFolder extends Document {
   name: string;
@@ -35,10 +36,6 @@ const folderSchema = new Schema<IFolder>(
     timestamps: true,
   },
 );
-
-if (process.env.NODE_ENV === "development") {
-  delete mongoose.models.Folder;
-}
 
 const Folder: Model<IFolder> =
   mongoose.models.Folder || mongoose.model<IFolder>("Folder", folderSchema);

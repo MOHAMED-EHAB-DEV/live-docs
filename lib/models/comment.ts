@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document as MongooseDocument, Model } from "mongoose";
+import "./document";
 
 export interface IComment extends MongooseDocument {
   documentId: mongoose.Types.ObjectId;

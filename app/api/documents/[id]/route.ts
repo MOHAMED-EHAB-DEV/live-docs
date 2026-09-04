@@ -11,7 +11,10 @@ export async function GET(
     const { id } = await params;
     await connectToDatabase();
 
-    const document = await Documents.findById(id).populate("collaborators.user", "name email image");
+    const document = await Documents.findById(id).populate(
+      "collaborators.user",
+      "name email image",
+    );
 
     if (!document) {
       return NextResponse.json(
@@ -81,10 +84,7 @@ export async function DELETE(
     }
 
     // Clean up document reference from any folders
-    await Folder.updateMany(
-      { documents: id },
-      { $pull: { documents: id } }
-    );
+    await Folder.updateMany({ documents: id }, { $pull: { documents: id } });
 
     return NextResponse.json({
       success: true,

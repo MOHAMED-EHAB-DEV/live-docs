@@ -105,7 +105,7 @@ export const Editor = ({ roomId, currentUserType, currentUserEmail, initialConte
 
   if (!provider || !ydoc) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3 w-full">
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] gap-3 w-full">
         <Loader text="Connecting to document..." size={32} />
       </div>
     );

@@ -50,7 +50,10 @@ export async function GET(request: Request) {
     const userId = searchParams.get("userId");
 
     if (!email || !userId) {
-      return NextResponse.json({ error: "Email and userId are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Email and userId are required" },
+        { status: 400 },
+      );
     }
 
     await connectToDatabase();

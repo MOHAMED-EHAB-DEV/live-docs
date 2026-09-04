@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import "./document";
 
 export interface ISubFolder extends Document {
   name: string;

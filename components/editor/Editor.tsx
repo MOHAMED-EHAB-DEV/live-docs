@@ -302,9 +302,9 @@ const TiptapEditor = ({ provider, ydoc, documentId, currentUserType, currentUser
   const handleBlockChange = (val: string) => {
     const chain = editor.chain().focus() as any;
     if (val === "paragraph") chain.setParagraph().run();
-    else if (val === "h1") chain.toggleHeading({ level: 1 }).run();
-    else if (val === "h2") chain.toggleHeading({ level: 2 }).run();
-    else if (val === "h3") chain.toggleHeading({ level: 3 }).run();
+    else if (val === "h1") chain.setHeading({ level: 1 }).run();
+    else if (val === "h2") chain.setHeading({ level: 2 }).run();
+    else if (val === "h3") chain.setHeading({ level: 3 }).run();
     else if (val === "blockquote") chain.toggleBlockquote().run();
     else if (val === "codeBlock") chain.toggleCodeBlock().run();
   };
